@@ -1,5 +1,8 @@
 package utils
 
+// This file deals with paths of the form `a.b[1]`, not any other kind
+// of path currently.
+
 import (
 	"strconv"
 	"strings"

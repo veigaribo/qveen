@@ -21,7 +21,7 @@ The `meta` table, if present, may contain the following entries:
 You can either provide `template` and `output` to process a single
 template or `pairs` to process multiple templates with the same data.
 Or both, in which case the root `template` and `output` constitute what
-is considered the first pair for reporting purpouses.
+is considered the first pair for reporting purposes.
 
 `template` may be a path to a local file or a URL. `output` may be a
 path to a local file or `-`, which will make the file be output to
