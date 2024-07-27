@@ -82,7 +82,8 @@ in the templates, whose default is `{{`;
 - `--right-delim` / `-r`: String to use as the right delimiter of
 actions in the templates, whose default is `}}`.
 
-`--template` and ``
+`--template` and `--output` will be expanded as templates in the same
+way as `meta.template` and `meta.output`.
 
 Options provided both in the parameter file and as a flags will assume
 the value assigned in the flag, unless it is the case of a pair of

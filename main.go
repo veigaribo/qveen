@@ -142,7 +142,7 @@ values ends with /, it its considered a prefix to apply to the other one.`,
 			Long:          "meta",
 			ParameterName: "meta-key",
 			Target:        &metaKeyFlag,
-			Description:   "Key to look for meta information, instead of `meta` (placeholders allowed).",
+			Description:   "Key to look for meta information, instead of `meta`.",
 		},
 		{
 			Type:          StringFlagType,
