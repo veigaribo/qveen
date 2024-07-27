@@ -3,12 +3,12 @@ package main
 import (
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"path"
 	"strings"
 
 	"github.com/veigaribo/qveen/prompts"
+	"github.com/veigaribo/qveen/utils"
 )
 
 // Constructs a path with optional prefix.
@@ -33,28 +33,19 @@ func (l *OutputLocation) Add(filename string) {
 	}
 }
 
-var ErrNoLeaf = errors.New("Output filename has only prefix.")
-var ErrAborted = errors.New("Aborted by user.")
+var ErrNoLeaf = errors.New("Output filename has only prefix")
+var ErrAborted = errors.New("Aborted by user")
 
 func (l *OutputLocation) Path() (string, error) {
 	if l.Leaf == "" {
 		return "", ErrNoLeaf
 	}
 
-	if strings.HasPrefix(l.Leaf, "/") {
+	if utils.IsStd(l.Leaf) {
 		return l.Leaf, nil
 	}
 
-	return path.Join(l.Stem, l.Leaf), nil
-}
-
-func (l *OutputLocation) Writer() (io.Writer, error) {
-	p, err := l.Path()
-
-	if err != nil {
-		return nil, err
-	}
-
+	p := path.Join(l.Stem, l.Leaf)
 	stat, err := os.Stat(p)
 
 	if err == nil {
@@ -62,15 +53,17 @@ func (l *OutputLocation) Writer() (io.Writer, error) {
 			goto ok
 		}
 
-		overwrite := prompts.AskConfirm(fmt.Sprintf("File '%s' already exists. Overwrite?", p))
+		overwrite := prompts.AskConfirm(
+			fmt.Sprintf("File '%s' already exists. Overwrite?", p),
+		)
 
 		if overwrite {
 			goto ok
 		} else {
-			return nil, ErrAborted
+			return "", ErrAborted
 		}
 	}
 
 ok:
-	return os.Create(p)
+	return p, nil
 }

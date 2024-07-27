@@ -1,7 +1,7 @@
 package params
 
 import (
-	"github.com/veigaribo/qveen/util"
+	"github.com/veigaribo/qveen/utils"
 	"strings"
 )
 
@@ -21,7 +21,7 @@ func (e ParamError) Error() string {
 	var builder strings.Builder
 
 	builder.WriteRune('`')
-	util.WritePathString(e.Path, &builder)
+	utils.WritePathString(e.Path, &builder)
 	builder.WriteRune('`')
 	builder.WriteRune(' ')
 	builder.WriteString(e.Reason)

@@ -2,7 +2,7 @@ package params
 
 import (
 	"github.com/veigaribo/qveen/templates"
-	"github.com/veigaribo/qveen/util"
+	"github.com/veigaribo/qveen/utils"
 )
 
 // Prompt param expansion must be done earlier to display the correct
@@ -14,7 +14,9 @@ func (p *ParsingParams) ExpandPromptParams(metaKey string) error {
 		entry := &p.Prompt[i]
 
 		templateName := func(field string) string {
-			return util.PathString([]any{metaKey, "prompts", i, field})
+			return utils.PathString(
+				[]any{metaKey, "prompts", i, field},
+			)
 		}
 
 		entry.Name, err = templates.ExpandString(
@@ -81,7 +83,7 @@ func expandParamsVisit(
 ) error {
 	if str, ok := value.(string); ok {
 		expanded, err := templates.ExpandString(
-			util.PathString(append(ptr.Path, ptr.Key)),
+			utils.PathString(append(ptr.Path, ptr.Key)),
 			str,
 			data,
 		)
@@ -121,7 +123,7 @@ func (p *ParsingParams) ExpandParams(metaKey string) error {
 	// Meta fields.
 
 	metaTemplateName := func(field string) string {
-		return util.PathString([]any{metaKey, field})
+		return utils.PathString([]any{metaKey, field})
 	}
 
 	p.Template, err = templates.ExpandString(

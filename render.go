@@ -10,6 +10,7 @@ import (
 	"github.com/veigaribo/qveen/params"
 	"github.com/veigaribo/qveen/prompts"
 	"github.com/veigaribo/qveen/templates"
+	"github.com/veigaribo/qveen/utils"
 )
 
 type Render1Options struct {
@@ -20,22 +21,13 @@ type Render1Options struct {
 }
 
 func Render1(opts Render1Options) {
-	var paramsIo io.Reader
+	paramsReader, err := utils.OpenFileOrUrl(opts.ParamsPath)
 
-	paramsPathFlag := opts.ParamsPath
-
-	if paramsPathFlag == "" || paramsPathFlag == "-" {
-		paramsIo = os.Stdin
-	} else {
-		var err error
-		paramsIo, err = os.Open(paramsPathFlag)
-
-		if err != nil {
-			panic(fmt.Errorf("Failed to open parameter file: %w", err))
-		}
+	if err != nil {
+		panic(fmt.Errorf("Failed to open parameter file: %w", err))
 	}
 
-	p, err := params.ParseParams(paramsIo, params.ParseParamsOptions{
+	p, err := params.ParseParams(paramsReader, params.ParseParamsOptions{
 		MetaKey: opts.MetaKey,
 	})
 
@@ -62,7 +54,7 @@ func RenderN(opts RenderNOptions) {
 		panic(fmt.Errorf("Output path in multi-file mode can only be a prefix, but received '%s'", opts.OutputDirPath))
 	}
 
-	var paramsIo io.Reader
+	// Store stdin so it can be used multiple times.
 
 	var stdinParams *params.ParsingParams
 	if slices.Contains(opts.ParamsPaths, "-") {
@@ -81,18 +73,17 @@ func RenderN(opts RenderNOptions) {
 	for i, paramsPath := range opts.ParamsPaths {
 		var p params.ParsingParams
 
-		if paramsPath == "-" {
+		if utils.IsStd(paramsPath) {
 			p = *stdinParams
 		} else {
-			var err error
-			paramsIo, err = os.Open(paramsPath)
+			paramsReader, err := utils.OpenFileOrUrl(paramsPath)
 
 			if err != nil {
 				panic(fmt.Errorf("Failed to open parameter file '%s' (#%d): %w", paramsPath, i, err))
 			}
 
 			p, err = params.ParseParams(
-				paramsIo,
+				paramsReader,
 				params.ParseParamsOptions{MetaKey: opts.MetaKey},
 			)
 
@@ -161,7 +152,13 @@ func render(opts renderOptions) {
 		templatePath = templatePathFlag
 	}
 
-	templateData, err := templates.GetTemplate(templatePath)
+	templateReader, err := utils.OpenFileOrUrl(templatePath)
+
+	if err != nil {
+		panic(fmt.Errorf("Failed to open template file: %w", err))
+	}
+
+	templateData, err := io.ReadAll(templateReader)
 
 	if err != nil {
 		panic(fmt.Errorf("Failed to read template file: %w", err))
@@ -181,7 +178,13 @@ func render(opts renderOptions) {
 	outputLoc.Add(outputPathFile)
 	outputLoc.Add(outputPathFlag)
 
-	output, err := outputLoc.Writer()
+	outputPath, err := outputLoc.Path()
+
+	if err != nil {
+		panic(fmt.Errorf("Failed to generate output path: %w", err))
+	}
+
+	output, err := utils.FileWriter(outputPath)
 
 	if err != nil {
 		panic(fmt.Errorf("Failed to create output file: %w", err))
@@ -193,8 +196,11 @@ func render(opts renderOptions) {
 		panic(fmt.Errorf("Failed to execute template: %w", err))
 	}
 
-	outputPath, _ := outputLoc.Path()
-	fmt.Println(templatePath, "->", outputPath)
+	if utils.IsStd(outputPath) {
+		// A little spacing for us humans.
+		fmt.Fprintln(os.Stderr, "")
+	}
+	fmt.Fprintln(os.Stderr, templatePath, "->", outputPath)
 }
 
 func doPrompt(ps []prompts.Prompt, out map[string]any) error {

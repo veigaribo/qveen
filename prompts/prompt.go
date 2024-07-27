@@ -1,10 +1,13 @@
 package prompts
 
 import (
+	"errors"
 	"reflect"
 	"strings"
+	"syscall"
 
 	"github.com/charmbracelet/huh"
+	"github.com/charmbracelet/x/term"
 )
 
 var SupportedPromptKinds = []string{
@@ -44,6 +47,11 @@ func AskConfirm(title string) bool {
 func DoPrompt(prompts []Prompt) (map[string]any, error) {
 	if len(prompts) == 0 {
 		return make(map[string]any), nil
+	}
+
+	// TODO: Prompt values as flags.
+	if !term.IsTerminal(uintptr(syscall.Stdin)) {
+		return nil, errors.New("Tried to prompt while not connected to a terminal")
 	}
 
 	valuePtrs := make(map[string]any)
