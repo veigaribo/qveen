@@ -22,7 +22,12 @@ type FlagType uint
 const (
 	StringFlagType FlagType = iota
 	BoolFlagType
+	StringToStringType
 )
+
+func (typ FlagType) AllowsMultiple() bool {
+	return typ == StringToStringType
+}
 
 type Flag struct {
 	Type          FlagType
@@ -43,6 +48,7 @@ func main() {
 
 	var templatePathFlag string
 	var outputPathFlag string
+	var promptValueFlags map[string]string
 
 	var metaKeyFlag string
 	var leftDelimFlag string
@@ -98,6 +104,7 @@ values ends with /, it its considered a prefix to apply to the other one.`,
 					TemplatePath: templatePathFlag,
 					OutputPath:   outputPathFlag,
 					MetaKey:      metaKeyFlag,
+					PromptValues: promptValueFlags,
 				}
 
 				Render1(opts)
@@ -110,6 +117,7 @@ values ends with /, it its considered a prefix to apply to the other one.`,
 					ParamsPaths:   args,
 					OutputDirPath: outputPathFlag,
 					MetaKey:       metaKeyFlag,
+					PromptValues:  promptValueFlags,
 				}
 
 				RenderN(opts)
@@ -135,6 +143,14 @@ values ends with /, it its considered a prefix to apply to the other one.`,
 			ParameterName: "output-file",
 			Target:        &outputPathFlag,
 			Description:   "Destination file name (placeholders allowed).",
+		},
+		{
+			Type:          StringToStringType,
+			Short:         "p",
+			Long:          "prompt-value",
+			ParameterName: "key=val",
+			Target:        &promptValueFlags,
+			Description:   "Sets a value for a prompt upfront.",
 		},
 		{
 			Type:          StringFlagType,
@@ -182,6 +198,16 @@ values ends with /, it its considered a prefix to apply to the other one.`,
 				flag.Long,
 				flag.Short,
 				false,
+				flag.Description,
+			)
+		case StringToStringType:
+			target := flag.Target.(*map[string]string)
+
+			rootCmd.Flags().StringToStringVarP(
+				target,
+				flag.Long,
+				flag.Short,
+				make(map[string]string),
 				flag.Description,
 			)
 		}
@@ -254,6 +280,10 @@ func Usage(flags []Flag) func(cmd *cobra.Command) error {
 				writeLine(">")
 			}
 
+			if flag.Type.AllowsMultiple() {
+				builder.WriteString(" ...")
+			}
+
 			writeLine("]")
 		}
 
@@ -296,6 +326,7 @@ func Usage(flags []Flag) func(cmd *cobra.Command) error {
 			builder.WriteString(flag.Short)
 			builder.WriteString(", --")
 			builder.WriteString(flag.Long)
+
 			return builder.String()
 		}
 

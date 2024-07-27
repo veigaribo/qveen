@@ -3,6 +3,7 @@ package prompts
 import (
 	"errors"
 	"reflect"
+	"strconv"
 	"strings"
 	"syscall"
 
@@ -15,11 +16,43 @@ var SupportedPromptKinds = []string{
 }
 
 type Prompt struct {
-	Kind  string
-	Name  string
-	Title string
-
+	Kind     string
+	Name     string
+	Title    string
 	Specific any
+
+	Value any
+}
+
+func (p *Prompt) TryPrefill(raw string) error {
+	switch p.Kind {
+	case "input":
+		fallthrough
+	case "text":
+		p.Value = raw
+	case "select":
+		specific := p.Specific.(PromptSelectSpecific)
+
+		for _, option := range specific.Options {
+			if option.Title == raw {
+				p.Value = option.Value
+				return nil
+			}
+		}
+
+		return errors.New("Given value for `select` prompt does not correspond to one of the options. (Needs to match the title)")
+	case "confirm":
+		value, err := strconv.ParseBool(raw)
+
+		if err != nil {
+			return err
+		}
+
+		p.Value = value
+		return nil
+	}
+
+	return nil
 }
 
 func (p Prompt) GetTitle() string {
@@ -58,6 +91,8 @@ func AskConfirm(title string) bool {
 }
 
 func DoPrompt(prompts []Prompt) (map[string]any, error) {
+	var err error
+
 	if len(prompts) == 0 {
 		return make(map[string]any), nil
 	}
@@ -68,9 +103,16 @@ func DoPrompt(prompts []Prompt) (map[string]any, error) {
 	}
 
 	valuePtrs := make(map[string]any)
+	values := make(map[string]any)
 	var fields []huh.Field
 
 	for _, prompt := range prompts {
+		if prompt.Value != nil {
+			// Prefilled.
+			valuePtrs[prompt.Name] = &prompt.Value
+			continue
+		}
+
 		switch prompt.Kind {
 		case "input":
 			fields = append(fields, promptInput(prompt, valuePtrs))
@@ -83,16 +125,24 @@ func DoPrompt(prompts []Prompt) (map[string]any, error) {
 		}
 	}
 
-	group := huh.NewGroup(fields...)
-	form := huh.NewForm(group)
+	var group *huh.Group
+	var form *huh.Form
 
-	values := make(map[string]any)
-	err := form.Run()
+	if len(fields) == 0 {
+		// If everything was prefilled.
+		goto resolve
+	}
+
+	group = huh.NewGroup(fields...)
+	form = huh.NewForm(group)
+
+	err = form.Run()
 
 	if err != nil {
 		return values, err
 	}
 
+resolve:
 	for key, valuePtr := range valuePtrs {
 		values[key] = reflect.ValueOf(valuePtr).Elem().Interface()
 	}

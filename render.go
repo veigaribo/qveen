@@ -18,6 +18,7 @@ type Render1Options struct {
 	TemplatePath string
 	OutputPath   string
 	MetaKey      string
+	PromptValues map[string]string
 }
 
 func Render1(opts Render1Options) {
@@ -40,6 +41,7 @@ func Render1(opts Render1Options) {
 		TemplatePathFlag: opts.TemplatePath,
 		OutputPathFlag:   opts.OutputPath,
 		MetaKey:          opts.MetaKey,
+		PromptValues:     opts.PromptValues,
 	})
 }
 
@@ -47,6 +49,7 @@ type RenderNOptions struct {
 	ParamsPaths   []string
 	OutputDirPath string
 	MetaKey       string
+	PromptValues  map[string]string
 }
 
 func RenderN(opts RenderNOptions) {
@@ -97,6 +100,7 @@ func RenderN(opts RenderNOptions) {
 			TemplatePathFlag: "",
 			OutputPathFlag:   "",
 			MetaKey:          opts.MetaKey,
+			PromptValues:     opts.PromptValues,
 		})
 	}
 }
@@ -106,11 +110,26 @@ type renderOptions struct {
 	TemplatePathFlag string
 	OutputPathFlag   string
 	MetaKey          string
+	PromptValues     map[string]string
 }
 
 // Ad-hoc function to do what both the above methods have in common.
 func render(opts renderOptions) {
 	opts.Params.ExpandPromptParams(opts.MetaKey)
+
+	for i := range opts.Params.Prompt {
+		prompt := &opts.Params.Prompt[i]
+		prefill, ok := opts.PromptValues[prompt.Name]
+
+		if ok {
+			err := prompt.TryPrefill(prefill)
+
+			if err != nil {
+				panic(fmt.Errorf("Failed to prefill prompt '%s' with '%s': %w", prompt.Name, prefill, err))
+			}
+		}
+	}
+
 	err := doPrompt(opts.Params.Prompt, opts.Params.Data)
 
 	if err != nil {
