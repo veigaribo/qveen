@@ -58,41 +58,8 @@ func main() {
 	rootCmd := cobra.Command{
 		Use:   "qveen",
 		Short: "Generate files from templates.",
-		Long: `Generate files from templates.
+		// TODO: Long description.
 
-The parameter file should contain valid TOML. Its
-contents will be used as the data from which to render the template.
-If a value of ` + "`-`" + ` is given, the contents will be expected to come
-from stdin.
-
-A [meta] table in the parameter file is treated in a special way.
-It may contain the following keys:
-
-- template: Go template file
-- output: File to output after rendering
-- prompt: Values to be provided interactively
-
-The prompt key is expected to contain an array of tables with the
-following keys:
-
-- kind: Determines the type of prompt to present
-- name: Name of the variable in which to bind
-- title: Text to show when prompting
-
-Currently, the allowed values for ` + "`kind`" + ` are { text }.
-
-If a variable is present both in the ` + "`meta.prompt`" + ` array and as a
-standalone value, the former one will be preferred.
-
-All of the above values may reference other values defined in the
-file using regular template syntax. However, expansion is not recursive:
-If a field containing a placeholder is included into another, that
-placeholder will be kept in the final value as is.
-
-The ` + "`template`" + ` and ` + "`output`" + ` flags will be used in case
-they are missing from the parameter file if and only if a single
-parameter file is provided. In the case of ` + "`output`" + `, if one of the
-values ends with /, it its considered a prefix to apply to the other one.`,
 		Args: cobra.ExactArgs(1),
 
 		Run: func(cmd *cobra.Command, args []string) {
@@ -310,8 +277,6 @@ func usage(flags []Flag) func(cmd *cobra.Command) error {
 		}
 
 		writeLine(" <params-file>")
-		maybeBreakLine()
-		writeLine(" [<params-file>...]")
 		breakLine()
 		breakLine()
 
