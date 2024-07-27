@@ -141,15 +141,10 @@ func render(opts renderOptions) {
 
 	var templatePathFile = opts.Params.Template
 
-	var templatePath string
-	if templatePathFlag == "" {
-		if templatePathFile == "" {
-			panic("Missing template file path.")
-		} else {
-			templatePath = templatePathFile
-		}
-	} else {
-		templatePath = templatePathFlag
+	templatePath := utils.FirstOf(templatePathFlag, templatePathFile)
+
+	if templatePath == "" {
+		panic("Missing template file path.")
 	}
 
 	templateReader, err := utils.OpenFileOrUrl(templatePath)
