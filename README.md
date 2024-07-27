@@ -122,7 +122,7 @@ way as `meta.template` and `meta.output`.
 Example:
 
 ``` shell
-qveen -l '<%=' -r '%>' -t templates/controller.ts.tmpl -o 'src/controllers/<%= kebabcase .name %>.ts' -p name=Brenda qveen/auth.toml
+qveen -l '<%=' -r '%>' -t templates/controller.ts.tmpl -o 'src/controllers/<%= kebabcase (lowercase .name) %>.ts' -p name=Brenda qveen/auth.toml
 ```
 
 ## Templates
