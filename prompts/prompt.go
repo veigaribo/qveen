@@ -22,6 +22,19 @@ type Prompt struct {
 	Specific any
 }
 
+func (p Prompt) GetTitle() string {
+	if p.Title != "" {
+		return p.Title
+	}
+
+	var builder strings.Builder
+	builder.WriteString("Value for '")
+	builder.WriteString(p.Name)
+	builder.WriteString("':")
+
+	return builder.String()
+}
+
 type PromptSelectOption struct {
 	Title string
 	Value any
@@ -89,11 +102,7 @@ func DoPrompt(prompts []Prompt) (map[string]any, error) {
 
 func promptInput(prompt Prompt, ptrs map[string]any) huh.Field {
 	var value string
-	title := prompt.Title
-
-	if title == "" {
-		title = defaultTitle(prompt.Name)
-	}
+	title := prompt.GetTitle()
 
 	ptrs[prompt.Name] = &value
 	return huh.NewInput().Title(title).Value(&value)
@@ -101,11 +110,7 @@ func promptInput(prompt Prompt, ptrs map[string]any) huh.Field {
 
 func promptText(prompt Prompt, ptrs map[string]any) huh.Field {
 	var value string
-	title := prompt.Title
-
-	if title == "" {
-		title = defaultTitle(prompt.Name)
-	}
+	title := prompt.GetTitle()
 
 	ptrs[prompt.Name] = &value
 	return huh.NewText().Title(title).Value(&value)
@@ -122,11 +127,7 @@ func promptSelect(prompt Prompt, ptrs map[string]any) huh.Field {
 			huh.NewOption(option.Title, option.Value))
 	}
 
-	title := prompt.Title
-	if title == "" {
-		title = defaultTitle(prompt.Name)
-	}
-
+	title := prompt.GetTitle()
 	ptrs[prompt.Name] = &value
 
 	return huh.NewSelect[any]().
@@ -137,21 +138,8 @@ func promptSelect(prompt Prompt, ptrs map[string]any) huh.Field {
 
 func promptConfirm(prompt Prompt, ptrs map[string]any) huh.Field {
 	var value bool
-	title := prompt.Title
-
-	if title == "" {
-		title = defaultTitle(prompt.Name)
-	}
+	title := prompt.GetTitle()
 
 	ptrs[prompt.Name] = &value
 	return huh.NewConfirm().Title(title).Value(&value)
-}
-
-func defaultTitle(name string) string {
-	var builder strings.Builder
-	builder.WriteString("Value for '")
-	builder.WriteString(name)
-	builder.WriteString("':")
-
-	return builder.String()
 }
