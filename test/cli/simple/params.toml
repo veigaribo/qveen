@@ -1,0 +1,5 @@
+value = "something"
+
+[meta]
+template = "template.tmpl"
+output = "result.txt"
