@@ -6,8 +6,8 @@ import (
 )
 
 // Prompt param expansion must be done earlier to display the correct
-// prompts.
-func (p *ParsingParams) ExpandPromptParams(metaKey string) error {
+// prompts...
+func (p *Params) ExpandPromptParams(metaKey string) error {
 	var err error
 
 	for i := range p.Prompt {
@@ -108,9 +108,9 @@ func expandParamsVisit(
 	return nil
 }
 
-// Other params must be expanded later to use the values of the
+// ...other params must be expanded later to use the values of the
 // prompts.
-func (p *ParsingParams) ExpandParams(metaKey string) error {
+func (p *Params) ExpandParams(metaKey string) error {
 	var err error
 
 	// General fields.
@@ -122,25 +122,33 @@ func (p *ParsingParams) ExpandParams(metaKey string) error {
 
 	// Meta fields.
 
-	metaTemplateName := func(field string) string {
-		return utils.PathString([]any{metaKey, field})
+	for i := range p.Pairs {
+		pair := &p.Pairs[i]
+
+		metaTemplateName := func(field string) string {
+			return utils.PathString(append(pair.Path, field))
+		}
+
+		pair.Template, err = templates.ExpandString(
+			metaTemplateName("template"),
+			pair.Template,
+			p.Data,
+		)
+
+		if err != nil {
+			return err
+		}
+
+		pair.Output, err = templates.ExpandString(
+			metaTemplateName("output"),
+			pair.Output,
+			p.Data,
+		)
+
+		if err != nil {
+			return err
+		}
 	}
-
-	p.Template, err = templates.ExpandString(
-		metaTemplateName("template"),
-		p.Template,
-		p.Data,
-	)
-
-	if err != nil {
-		return err
-	}
-
-	p.Output, err = templates.ExpandString(
-		metaTemplateName("output"),
-		p.Output,
-		p.Data,
-	)
 
 	if err != nil {
 		return err

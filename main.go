@@ -93,38 +93,22 @@ The ` + "`template`" + ` and ` + "`output`" + ` flags will be used in case
 they are missing from the parameter file if and only if a single
 parameter file is provided. In the case of ` + "`output`" + `, if one of the
 values ends with /, it its considered a prefix to apply to the other one.`,
-		Args: cobra.MinimumNArgs(1),
+		Args: cobra.ExactArgs(1),
 
 		Run: func(cmd *cobra.Command, args []string) {
 			templates.LeftDelim = leftDelimFlag
 			templates.RightDelim = rightDelimFlag
 
-			if len(args) == 1 {
-				opts := Render1Options{
-					ParamsPath:   args[0],
-					TemplatePath: templatePathFlag,
-					OutputPath:   outputPathFlag,
-					MetaKey:      metaKeyFlag,
-					PromptValues: promptValueFlags,
-					Overwrite:    overwriteFlag,
-				}
-
-				Render1(opts)
-			} else {
-				if templatePathFlag != "" {
-					fmt.Fprintln(os.Stderr, "Ignoring `template` flag on multi-file mode.")
-				}
-
-				opts := RenderNOptions{
-					ParamsPaths:   args,
-					OutputDirPath: outputPathFlag,
-					MetaKey:       metaKeyFlag,
-					PromptValues:  promptValueFlags,
-					Overwrite:     overwriteFlag,
-				}
-
-				RenderN(opts)
+			opts := RenderOptions{
+				ParamsPath:   args[0],
+				TemplatePath: templatePathFlag,
+				OutputPath:   outputPathFlag,
+				MetaKey:      metaKeyFlag,
+				PromptValues: promptValueFlags,
+				Overwrite:    overwriteFlag,
 			}
+
+			Render(opts)
 		},
 	}
 

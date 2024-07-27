@@ -9,11 +9,20 @@ import (
 	"github.com/veigaribo/qveen/prompts"
 )
 
-type ParsingParams struct {
+type ParamsPair struct {
 	Template string
 	Output   string
-	Prompt   []prompts.Prompt
-	Data     map[string]any
+
+	// Because a pair may be found in multiple keys (`meta` or
+	// `meta.pairs[#]`), store it here so we can show appropriate
+	// error messages after parsing.
+	Path []any
+}
+
+type Params struct {
+	Data   map[string]any
+	Pairs  []ParamsPair
+	Prompt []prompts.Prompt
 }
 
 type ParseParamsOptions struct {
@@ -23,21 +32,21 @@ type ParseParamsOptions struct {
 func ParseParams(
 	input io.Reader,
 	opts ParseParamsOptions,
-) (ParsingParams, error) {
+) (Params, error) {
 	if opts.MetaKey == "" {
 		opts.MetaKey = "meta"
 	}
 
-	var params ParsingParams
+	var params Params
 	var err error
 
-	err = params.ParseGeneralParams(input)
+	err = params.ParseGeneral(input)
 
 	if err != nil {
 		return params, err
 	}
 
-	err = params.ParseMetaParams(opts)
+	err = params.ParseMeta(opts)
 
 	if err != nil {
 		return params, err
@@ -46,7 +55,7 @@ func ParseParams(
 	return params, nil
 }
 
-func (params *ParsingParams) ParseGeneralParams(
+func (params *Params) ParseGeneral(
 	input io.Reader,
 ) error {
 	bytes, err := io.ReadAll(input)
@@ -64,7 +73,7 @@ func (params *ParsingParams) ParseGeneralParams(
 	return nil
 }
 
-func (params *ParsingParams) ParseMetaParams(opts ParseParamsOptions) error {
+func (params *Params) ParseMeta(opts ParseParamsOptions) error {
 	metaRaw, ok := params.Data[opts.MetaKey]
 
 	if !ok {
@@ -80,6 +89,26 @@ func (params *ParsingParams) ParseMetaParams(opts ParseParamsOptions) error {
 		)
 	}
 
+	err := params.parseMetaPairs(meta, []any{opts.MetaKey})
+
+	if err != nil {
+		return err
+	}
+
+	err = params.parseMetaPrompts(meta, []any{opts.MetaKey})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *Params) parseMetaPairs(
+	meta map[string]any, path []any,
+) error {
+	var rootTemplate, rootOutput string
+
 	templateRaw, ok := meta["template"]
 
 	if ok {
@@ -87,12 +116,12 @@ func (params *ParsingParams) ParseMetaParams(opts ParseParamsOptions) error {
 
 		if !ok {
 			return MakeParamError(
-				[]any{opts.MetaKey, "template"},
+				append(path, "template"),
 				"field present but does not contain a string.",
 			)
 		}
 
-		params.Template = template
+		rootTemplate = template
 	}
 
 	outputRaw, ok := meta["output"]
@@ -102,14 +131,126 @@ func (params *ParsingParams) ParseMetaParams(opts ParseParamsOptions) error {
 
 		if !ok {
 			return MakeParamError(
-				[]any{opts.MetaKey, "output"},
+				append(path, "output"),
 				"field present but does not contain a string.",
 			)
 		}
 
-		params.Output = output
+		rootOutput = output
 	}
 
+	if rootTemplate != "" {
+		if rootOutput != "" {
+			// Has template, has output.
+			p.Pairs = append(p.Pairs, ParamsPair{
+				Template: rootTemplate,
+				Output:   rootOutput,
+				Path:     path,
+			})
+		} else {
+			// Has template, doesn't have output.
+			return MakeParamError(
+				append(path, "output"),
+				"found root template but did not find root output.",
+			)
+		}
+	} else {
+		if rootOutput != "" {
+			// Has output, doesn't have template.
+			return MakeParamError(
+				append(path, "template"),
+				"found root output but did not find root template.",
+			)
+		}
+
+		// Doesn't have template, doesn't have output.
+	}
+
+	pairsRaw, ok := meta["pairs"]
+
+	if ok {
+		pairs, ok := pairsRaw.([]any)
+
+		if !ok {
+			return MakeParamError(
+				append(path, "pairs"),
+				"field present but does not contain an array.",
+			)
+		}
+
+		for i, pairRaw := range pairs {
+			entry, ok := pairRaw.(map[string]any)
+
+			if !ok {
+				return MakeParamError(
+					append(path, "pairs", i),
+					"field present but does not contain a map.",
+				)
+			}
+
+			pair, err := parseMetaPair(entry,
+				append(path, "pairs", i),
+			)
+
+			if err != nil {
+				return err
+			}
+
+			p.Pairs = append(p.Pairs, pair)
+		}
+	}
+
+	return nil
+}
+
+func parseMetaPair(
+	entry map[string]any, path []any,
+) (ParamsPair, error) {
+	var pair ParamsPair
+
+	templateRaw, ok := entry["template"]
+
+	if !ok {
+		return pair, MakeParamError(
+			append(path, "template"),
+			"required field missing.",
+		)
+	}
+
+	pair.Template, ok = templateRaw.(string)
+
+	if !ok {
+		return pair, MakeParamError(
+			append(path, "template"),
+			"field present but does not contain a string.",
+		)
+	}
+
+	outputRaw, ok := entry["output"]
+
+	if !ok {
+		return pair, MakeParamError(
+			append(path, "output"),
+			"required field missing.",
+		)
+	}
+
+	pair.Output, ok = outputRaw.(string)
+
+	if !ok {
+		return pair, MakeParamError(
+			append(path, "output"),
+			"field present but does not contain a string.",
+		)
+	}
+
+	pair.Path = path
+	return pair, nil
+}
+
+func (p *Params) parseMetaPrompts(
+	meta map[string]any, path []any,
+) error {
 	promptRaw, ok := meta["prompt"]
 
 	if ok {
@@ -117,7 +258,7 @@ func (params *ParsingParams) ParseMetaParams(opts ParseParamsOptions) error {
 
 		if !ok {
 			return MakeParamError(
-				[]any{opts.MetaKey, "prompt"},
+				append(path, "prompt"),
 				"field present but does not contain an array.",
 			)
 		}
@@ -127,20 +268,20 @@ func (params *ParsingParams) ParseMetaParams(opts ParseParamsOptions) error {
 
 			if !ok {
 				return MakeParamError(
-					[]any{opts.MetaKey, "prompt", i},
+					append(path, "prompt", i),
 					"field present but does not contain a map.",
 				)
 			}
 
 			prompt, err := parseMetaPrompt(entry,
-				[]any{opts.MetaKey, "prompt", i},
+				append(path, "prompt", i),
 			)
 
 			if err != nil {
 				return err
 			}
 
-			params.Prompt = append(params.Prompt, prompt)
+			p.Prompt = append(p.Prompt, prompt)
 		}
 	}
 
