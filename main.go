@@ -53,6 +53,7 @@ func main() {
 	var metaKeyFlag string
 	var leftDelimFlag string
 	var rightDelimFlag string
+	var overwriteFlag bool
 
 	rootCmd := cobra.Command{
 		Use:   "qveen",
@@ -105,6 +106,7 @@ values ends with /, it its considered a prefix to apply to the other one.`,
 					OutputPath:   outputPathFlag,
 					MetaKey:      metaKeyFlag,
 					PromptValues: promptValueFlags,
+					Overwrite:    overwriteFlag,
 				}
 
 				Render1(opts)
@@ -118,6 +120,7 @@ values ends with /, it its considered a prefix to apply to the other one.`,
 					OutputDirPath: outputPathFlag,
 					MetaKey:       metaKeyFlag,
 					PromptValues:  promptValueFlags,
+					Overwrite:     overwriteFlag,
 				}
 
 				RenderN(opts)
@@ -176,41 +179,17 @@ values ends with /, it its considered a prefix to apply to the other one.`,
 			Target:        &rightDelimFlag,
 			Description:   "String to use as the right delimiter for the template instead of `}}`.",
 		},
+		{
+			Type:        BoolFlagType,
+			Short:       "y",
+			Long:        "overwrite",
+			Target:      &overwriteFlag,
+			Description: "If set, won't ask for confirmation when overwriting files.",
+		},
 	}
 
 	for _, flag := range flags {
-		switch flag.Type {
-		case StringFlagType:
-			target := flag.Target.(*string)
-
-			rootCmd.Flags().StringVarP(
-				target,
-				flag.Long,
-				flag.Short,
-				"",
-				flag.Description,
-			)
-		case BoolFlagType:
-			target := flag.Target.(*bool)
-
-			rootCmd.Flags().BoolVarP(
-				target,
-				flag.Long,
-				flag.Short,
-				false,
-				flag.Description,
-			)
-		case StringToStringType:
-			target := flag.Target.(*map[string]string)
-
-			rootCmd.Flags().StringToStringVarP(
-				target,
-				flag.Long,
-				flag.Short,
-				make(map[string]string),
-				flag.Description,
-			)
-		}
+		registerFlag(&rootCmd, flag)
 	}
 
 	// Add information for `--help` so it shows up in the usage, but
@@ -224,7 +203,7 @@ values ends with /, it its considered a prefix to apply to the other one.`,
 		Description: "Show this message and exit.",
 	})
 
-	rootCmd.SetUsageFunc(Usage(flags))
+	rootCmd.SetUsageFunc(usage(flags))
 
 	err := rootCmd.Execute()
 
@@ -233,7 +212,42 @@ values ends with /, it its considered a prefix to apply to the other one.`,
 	}
 }
 
-func Usage(flags []Flag) func(cmd *cobra.Command) error {
+func registerFlag(cmd *cobra.Command, flag Flag) {
+	switch flag.Type {
+	case StringFlagType:
+		target := flag.Target.(*string)
+
+		cmd.Flags().StringVarP(
+			target,
+			flag.Long,
+			flag.Short,
+			"",
+			flag.Description,
+		)
+	case BoolFlagType:
+		target := flag.Target.(*bool)
+
+		cmd.Flags().BoolVarP(
+			target,
+			flag.Long,
+			flag.Short,
+			false,
+			flag.Description,
+		)
+	case StringToStringType:
+		target := flag.Target.(*map[string]string)
+
+		cmd.Flags().StringToStringVarP(
+			target,
+			flag.Long,
+			flag.Short,
+			make(map[string]string),
+			flag.Description,
+		)
+	}
+}
+
+func usage(flags []Flag) func(cmd *cobra.Command) error {
 	return func(cmd *cobra.Command) error {
 		// Not a hard limit. Will not break line if not in a good
 		// position to do so. A bit lower than usual to compensate.

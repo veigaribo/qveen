@@ -4,10 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"net/http"
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/veigaribo/qveen/prompts"
 )
 
 var urlRegexp *regexp.Regexp
@@ -61,12 +64,41 @@ func OpenFileOrUrl(path string) (io.Reader, error) {
 	}
 }
 
-func FileWriter(path string) (io.Writer, error) {
+var ErrAborted = errors.New("Aborted by user")
+
+func FileWriter(path string, skipConfirm bool) (io.Writer, error) {
 	if path == "" {
 		return nil, errors.New("Tried to write to an empty file path")
 	}
 
 	if IsLocalFile(path) {
+		var stat fs.FileInfo
+		var err error
+
+		if skipConfirm {
+			goto ok
+		}
+
+		// Check for overwrites.
+		stat, err = os.Stat(path)
+
+		if err == nil {
+			if stat.IsDir() {
+				goto ok
+			}
+
+			overwrite := prompts.AskConfirm(
+				fmt.Sprintf("File '%s' already exists. Overwrite?", path),
+			)
+
+			if overwrite {
+				goto ok
+			} else {
+				return nil, ErrAborted
+			}
+		}
+
+	ok:
 		return os.Create(path)
 	} else if IsStd(path) {
 		return os.Stdout, nil // Since it's for writing, assume stdout

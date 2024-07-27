@@ -19,6 +19,7 @@ type Render1Options struct {
 	OutputPath   string
 	MetaKey      string
 	PromptValues map[string]string
+	Overwrite    bool
 }
 
 func Render1(opts Render1Options) {
@@ -42,6 +43,7 @@ func Render1(opts Render1Options) {
 		OutputPathFlag:   opts.OutputPath,
 		MetaKey:          opts.MetaKey,
 		PromptValues:     opts.PromptValues,
+		Overwrite:        opts.Overwrite,
 	})
 }
 
@@ -50,6 +52,7 @@ type RenderNOptions struct {
 	OutputDirPath string
 	MetaKey       string
 	PromptValues  map[string]string
+	Overwrite     bool
 }
 
 func RenderN(opts RenderNOptions) {
@@ -101,6 +104,7 @@ func RenderN(opts RenderNOptions) {
 			OutputPathFlag:   "",
 			MetaKey:          opts.MetaKey,
 			PromptValues:     opts.PromptValues,
+			Overwrite:        opts.Overwrite,
 		})
 	}
 }
@@ -111,6 +115,7 @@ type renderOptions struct {
 	OutputPathFlag   string
 	MetaKey          string
 	PromptValues     map[string]string
+	Overwrite        bool
 }
 
 // Ad-hoc function to do what both the above methods have in common.
@@ -198,7 +203,7 @@ func render(opts renderOptions) {
 		panic(fmt.Errorf("Failed to generate output path: %w", err))
 	}
 
-	output, err := utils.FileWriter(outputPath)
+	output, err := utils.FileWriter(outputPath, opts.Overwrite)
 
 	if err != nil {
 		panic(fmt.Errorf("Failed to create output file: %w", err))
