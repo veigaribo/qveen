@@ -141,10 +141,7 @@ func Render(opts RenderOptions) {
 		}
 
 		t := template.Must(
-			template.
-				New(templatePath).
-				Delims(templates.LeftDelim, templates.RightDelim).
-				Funcs(templates.Funcs).
+			templates.GetTemplate().
 				Parse(string(templateData)),
 		)
 
