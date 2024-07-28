@@ -250,14 +250,14 @@ func parseMetaPair(
 func (p *Params) parseMetaPrompts(
 	meta map[string]any, path []any,
 ) error {
-	promptRaw, ok := meta["prompt"]
+	promptRaw, ok := meta["prompts"]
 
 	if ok {
 		prompt, ok := promptRaw.([]any)
 
 		if !ok {
 			return MakeParamError(
-				append(path, "prompt"),
+				append(path, "prompts"),
 				"field present but does not contain an array.",
 			)
 		}
@@ -267,13 +267,13 @@ func (p *Params) parseMetaPrompts(
 
 			if !ok {
 				return MakeParamError(
-					append(path, "prompt", i),
+					append(path, "prompts", i),
 					"field present but does not contain a map.",
 				)
 			}
 
 			prompt, err := parseMetaPrompt(entry,
-				append(path, "prompt", i),
+				append(path, "prompts", i),
 			)
 
 			if err != nil {

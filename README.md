@@ -16,7 +16,7 @@ The `meta` table, if present, may contain the following entries:
 - `template`: A path to the Go template file to be expanded;
 - `output`: The file path in which to store the resulting file;
 - `pairs`: Pairs of templates and outputs;
-- `prompt`: A list of values to be provided interactively.
+- `prompts`: A list of values to be provided interactively.
 
 You can either provide `template` and `output` to process a single
 template or `pairs` to process multiple templates with the same data.
@@ -31,7 +31,7 @@ Additionally, `meta.output` may be a directory ending with `/`. In that
 case, it will function as a prefix, and the remainder of the path must
 be provided as a flag when invoking the tool.
 
-The prompt key allows for values to be interactively provided and is
+The `prompts` key allows for values to be interactively provided and is
 expected to contain an array of tables with the following keys:
 
 - `kind`: Determines the type of prompt to present. Allowed values are
@@ -56,11 +56,11 @@ if not running in an interactive terminal.
 
 Almost\* every value in the parameter file may reference others using
 template syntax, however expansion is done only once, i.e. not
-recursively, and in three steps: first for the `meta.prompt` values,
+recursively, and in three steps: first for the `meta.prompts` values,
 before actually performing the prompts, then for regular values outside
 of the `meta` table, and the for the remaining values in the `meta` table.
 
-\* `meta.prompt[].kind` is currently an exception and does not expand.
+\* `meta.prompts[].kind` is currently an exception and does not expand.
 
 Example:
 
@@ -80,7 +80,7 @@ template = "templates/route_test.go.tmpl"
 output = "routes/{{snakecase .name}}_route_test.go"
 
 # Available as {{.name}}
-[[meta.prompt]]
+[[meta.prompts]]
 name = "name"
 kind = "text"
 title = "Name:"

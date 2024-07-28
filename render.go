@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"text/template"
 
 	"github.com/veigaribo/qveen/params"
 	"github.com/veigaribo/qveen/prompts"
@@ -140,10 +139,11 @@ func Render(opts RenderOptions) {
 			}
 		}
 
-		t := template.Must(
-			templates.GetTemplate().
-				Parse(string(templateData)),
-		)
+		t, err := templates.GetTemplate().Parse(string(templateData))
+
+		if err != nil {
+			panic(fmt.Errorf("Failed to parse template: %w", err))
+		}
 
 		var outputPathParams = pair.Output
 

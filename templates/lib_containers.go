@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func Map(values ...any) (map[string]any, error) {
+func TemplateMap(values ...any) (map[string]any, error) {
 	if len(values)%2 != 0 {
 		return nil, fmt.Errorf("Tried to construct map with an odd number of arguments (%d).", len(values))
 	}

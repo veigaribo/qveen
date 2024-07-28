@@ -6,16 +6,16 @@ import (
 	"unicode/utf8"
 )
 
-func UpperCase(str string) string {
+func TemplateUpperCase(str string) string {
 	return strings.ToUpper(str)
 }
 
-func LowerCase(str string) string {
+func TemplateLowerCase(str string) string {
 	return strings.ToLower(str)
 }
 
 // `str` should be separated by spaces.
-func TitleCase(str string) string {
+func TemplateTitleCase(str string) string {
 	var builder strings.Builder
 	builder.Grow(len(str))
 
@@ -38,7 +38,7 @@ func TitleCase(str string) string {
 }
 
 // `str` should be separated by spaces.
-func PascalCase(str string) string {
+func TemplatePascalCase(str string) string {
 	var builder strings.Builder
 	builder.Grow(len(str))
 
@@ -62,7 +62,7 @@ func PascalCase(str string) string {
 }
 
 // `str` should be separated by spaces.
-func CamelCase(str string) string {
+func TemplateCamelCase(str string) string {
 	var builder strings.Builder
 	builder.Grow(len(str))
 
@@ -86,7 +86,7 @@ func CamelCase(str string) string {
 }
 
 // `str` should be separated by spaces.
-func SnakeCase(str string) string {
+func TemplateSnakeCase(str string) string {
 	var builder strings.Builder
 	builder.Grow(len(str))
 
@@ -102,7 +102,7 @@ func SnakeCase(str string) string {
 }
 
 // `str` should be separated by spaces.
-func KebabCase(str string) string {
+func TemplateKebabCase(str string) string {
 	var builder strings.Builder
 	builder.Grow(len(str))
 
@@ -118,7 +118,7 @@ func KebabCase(str string) string {
 }
 
 // `str` should be separated by spaces.
-func ConstantCase(str string) string {
+func TemplateConstantCase(str string) string {
 	var builder strings.Builder
 	builder.Grow(len(str))
 
@@ -134,7 +134,7 @@ func ConstantCase(str string) string {
 }
 
 // `str` should be separated by spaces.
-func DotCase(str string) string {
+func TemplateDotCase(str string) string {
 	var builder strings.Builder
 	builder.Grow(len(str))
 
@@ -150,7 +150,7 @@ func DotCase(str string) string {
 }
 
 // `str` should be separated by spaces.
-func SentenceCase(str string) string {
+func TemplateSentenceCase(str string) string {
 	var builder strings.Builder
 	builder.Grow(len(str))
 

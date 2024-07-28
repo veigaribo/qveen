@@ -3,22 +3,29 @@ package templates
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"text/template"
 )
 
 var Funcs = template.FuncMap{
-	"uppercase":    UpperCase,
-	"lowercase":    LowerCase,
-	"titlecase":    TitleCase,
-	"pascalcase":   PascalCase,
-	"camelcase":    CamelCase,
-	"snakecase":    SnakeCase,
-	"kebabcase":    KebabCase,
-	"constcase":    ConstantCase,
-	"dotcase":      DotCase,
-	"sentencecase": SentenceCase,
+	"uppercase":    TemplateUpperCase,
+	"lowercase":    TemplateLowerCase,
+	"titlecase":    TemplateTitleCase,
+	"pascalcase":   TemplatePascalCase,
+	"camelcase":    TemplateCamelCase,
+	"snakecase":    TemplateSnakeCase,
+	"kebabcase":    TemplateKebabCase,
+	"constcase":    TemplateConstantCase,
+	"dotcase":      TemplateDotCase,
+	"sentencecase": TemplateSentenceCase,
 
-	"map": Map,
+	"map": TemplateMap,
+
+	"err":  TemplateErr,
+	"tmpl": TemplateTmpl,
+
+	"jq1": TemplateJq1,
+	"jqn": TemplateJqN,
 }
 
 var LeftDelim string = ""
@@ -30,7 +37,7 @@ func init() {
 	var err error
 
 	baseTemplate = template.
-		New("qveen_base").
+		New("qveen").
 		Delims(LeftDelim, RightDelim).
 		Funcs(Funcs)
 
@@ -42,13 +49,32 @@ func init() {
 		baseTemplate, err = baseTemplate.Parse(builtin)
 
 		if err != nil {
-			panic(fmt.Errorf("Failed to parse builtin template #%d!", i))
+			panic(fmt.Errorf("Failed to parse builtin template #%d! %w", i, err))
 		}
 	}
 }
 
-func GetTemplate() *template.Template {
-	return template.Must(baseTemplate.Clone())
+type WrappedTemplate struct {
+	Template *template.Template
+}
+
+func (w WrappedTemplate) Parse(text string) (WrappedTemplate, error) {
+	t, err := w.Template.Parse(text)
+	return WrappedTemplate{t}, err
+}
+
+func (w WrappedTemplate) Execute(wr io.Writer, data any) error {
+	// HACK: Allows for nested template expansions that are not usually
+	// possible.
+	CurrentTemplate = w.Template
+	err := w.Template.Execute(wr, data)
+	CurrentTemplate = nil
+
+	return err
+}
+
+func GetTemplate() WrappedTemplate {
+	return WrappedTemplate{template.Must(baseTemplate.Clone())}
 }
 
 func ExpandString(name, content string, data map[string]any) (string, error) {
