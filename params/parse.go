@@ -139,31 +139,12 @@ func (p *Params) parseMetaPairs(
 		rootOutput = output
 	}
 
-	if rootTemplate != "" {
-		if rootOutput != "" {
-			// Has template, has output.
-			p.Pairs = append(p.Pairs, ParamsPair{
-				Template: rootTemplate,
-				Output:   rootOutput,
-				Path:     path,
-			})
-		} else {
-			// Has template, doesn't have output.
-			return MakeParamError(
-				append(path, "output"),
-				"found root template but did not find root output.",
-			)
-		}
-	} else {
-		if rootOutput != "" {
-			// Has output, doesn't have template.
-			return MakeParamError(
-				append(path, "template"),
-				"found root output but did not find root template.",
-			)
-		}
-
-		// Doesn't have template, doesn't have output.
+	if rootTemplate != "" || rootOutput != "" {
+		p.Pairs = append(p.Pairs, ParamsPair{
+			Template: rootTemplate,
+			Output:   rootOutput,
+			Path:     path,
+		})
 	}
 
 	pairsRaw, ok := meta["pairs"]
@@ -197,6 +178,24 @@ func (p *Params) parseMetaPairs(
 			}
 
 			p.Pairs = append(p.Pairs, pair)
+		}
+	}
+
+	if len(p.Pairs) > 1 {
+		first := p.Pairs[0]
+
+		if first.Template == "" {
+			return MakeParamError(
+				append(first.Path, "template"),
+				"required field for multiple pairs missing.",
+			)
+		}
+
+		if first.Output == "" {
+			return MakeParamError(
+				append(first.Path, "output"),
+				"required field for multiple pairs missing.",
+			)
 		}
 	}
 
