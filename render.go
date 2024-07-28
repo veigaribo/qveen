@@ -37,6 +37,12 @@ func Render(opts RenderOptions) {
 		panic(fmt.Errorf("Failed to parse parameter file: %w", err))
 	}
 
+	if len(p.Pairs) == 0 {
+		// Nothing to do.
+		fmt.Fprintf(os.Stderr, "Nothing to do.\n")
+		return
+	}
+
 	p.ExpandPromptParams(opts.MetaKey)
 
 	for i := range p.Prompt {
