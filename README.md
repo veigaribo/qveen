@@ -60,7 +60,7 @@ recursively, and in three steps: first for the `meta.prompt` values,
 before actually performing the prompts, then for regular values outside
 of the `meta` table, and the for the remaining values in the `meta` table.
 
-\* `meta.prompt[#].kind` is currently an exception and does not expand.
+\* `meta.prompt[].kind` is currently an exception and does not expand.
 
 Example:
 
@@ -73,7 +73,7 @@ language = "en_US"
 template = "templates/route.go.tmpl"
 output = "routes/{{snakecase .name}}_route.go"
 
-# Using `meta.pairs[#].{template,output}` at the same time.
+# Using `meta.pairs[].{template,output}` at the same time.
 # Both `output` files will be generated.
 [[meta.pairs]]
 template = "templates/route_test.go.tmpl"
@@ -105,15 +105,15 @@ which means the contents should come from stdin.
   `-p name="value"` will set the value `value` to the prompt named
   `name`. The value should be valid for the respective kind of prompt.
   If providing a value for a `select` prompt, use the option's `title`
-  on the right-hand side: `-p selection="Title's option"`;
+  on the right-hand side: `-p selection="Option's title"`;
 - `--meta-key` / `-m`: Changes the key in which to look for metadata
   from the default of `meta`. Must be a top-level field;
 - `--left-delim` / `-l`: Changes the string to use as the left
   delimiter of actions in the templates from the default `{{`;
 - `--right-delim` / `-r`: Changes the string to use as the right
-  delimiter of actions in the templates instead of the default `}}`.
-- `--overwrite` / `-y`: Skips the confirmation that Qveen would require
-  before writing over existing files.
+  delimiter of actions in the templates from the default `}}`.
+- `--overwrite` / `-y`: Skips the confirmation that Qveen would normally
+  require before writing over existing files.
 - `--help` / `-h`: Displays information and immediately exits.
 
 `--template` and `--output` will be expanded as templates in the same
@@ -141,7 +141,7 @@ The utility functions:
 - `snakecase`: `for example` to `for_example`;
 - `kebabcase`: `for example` to `for-example`;
 - `constcase`: `for example` to `FOR_EXAMPLE`;
-- `dotcase`: `for example` to `for.example`;
+- `dotcase`: `for example` to `for.example`.
 
 are also provided. They work on the assumption that words are separated
 by spaces, and the programming-related ones work best when the input
