@@ -1,0 +1,98 @@
+package = "params"
+
+[[errors]]
+name = "MetaWrongType"
+msg = "field present but does not contain a table."
+
+[[errors]]
+name = "MetaRootTemplateWrongType"
+msg = "field present but does not contain a string."
+
+[[errors]]
+name = "MetaRootOutputWrongType"
+msg = "field present but does not contain a string."
+
+[[errors]]
+name = "MetaPairsWrongType"
+msg = "field present but does not contain an array."
+
+[[errors]]
+name = "MetaPairWrongType"
+msg = "field present but does not contain a table."
+
+[[errors]]
+name = "MetaRootTemplateMissingInMultiple"
+msg = "required field is required for multiple files but is missing."
+
+[[errors]]
+name = "MetaRootOutputMissingInMultiple"
+msg = "required field is required for multiple files but is missing."
+
+[[errors]]
+name = "MetaPairTemplateMissing"
+msg = "missing required field."
+
+[[errors]]
+name = "MetaPairTemplateWrongType"
+msg = "field present but does not contain a string."
+
+[[errors]]
+name = "MetaPairOutputMissing"
+msg = "missing required field."
+
+[[errors]]
+name = "MetaPairOutputWrongType"
+msg = "field present but does not contain a string."
+
+[[errors]]
+name = "MetaPromptsWrongType"
+msg = "field present but does not contain an array."
+
+[[errors]]
+name = "MetaPromptWrongType"
+msg = "field present but does not contain a table."
+
+[[errors]]
+name = "MetaPromptNameMissing"
+msg = "missing required field."
+
+[[errors]]
+name = "MetaPromptNameWrongType"
+msg = "field present but does not contain a string."
+
+[[errors]]
+name = "MetaPromptKindWrongType"
+msg = "field present but does not contain a string."
+
+[[errors]]
+name = "MetaPromptKindInvalid"
+msgf = "field does not contain one of the allowed values: %v."
+msgp = ["prompts.SupportedPromptKinds"]
+
+[[errors]]
+name = "MetaPromptTitleWrongType"
+msg = "field present but does not contain a string."
+
+[[errors]]
+name = "MetaPromptOptionsMissing"
+msg = "required field for `select` is missing."
+
+[[errors]]
+name = "MetaPromptOptionsWrongType"
+msg = "field present but does not contain an array."
+
+[[errors]]
+name = "MetaPromptOptionTitleMissing"
+msg = "missing required field."
+
+[[errors]]
+name = "MetaPromptOptionTitleWrongType"
+msg = "field present but does not contain a string."
+
+[[errors]]
+name = "MetaPromptOptionWrongType"
+msg = "field present but contains neither a string nor a table."
+
+[meta]
+template = "qveen/params_errors.go.tmpl"
+output = "params/errors.go"

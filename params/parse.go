@@ -1,7 +1,6 @@
 package params
 
 import (
-	"fmt"
 	"io"
 	"slices"
 
@@ -83,10 +82,7 @@ func (params *Params) ParseMeta(opts ParseParamsOptions) error {
 	meta, ok := metaRaw.(map[string]any)
 
 	if !ok {
-		return MakeParamError(
-			[]any{opts.MetaKey},
-			"field present but does not contain a table.",
-		)
+		return MakeMetaWrongTypeError([]any{opts.MetaKey})
 	}
 
 	err := params.parseMetaPairs(meta, []any{opts.MetaKey})
@@ -115,10 +111,7 @@ func (p *Params) parseMetaPairs(
 		template, ok := templateRaw.(string)
 
 		if !ok {
-			return MakeParamError(
-				append(path, "template"),
-				"field present but does not contain a string.",
-			)
+			return MakeMetaRootTemplateWrongTypeError(append(path, "template"))
 		}
 
 		rootTemplate = template
@@ -130,10 +123,7 @@ func (p *Params) parseMetaPairs(
 		output, ok := outputRaw.(string)
 
 		if !ok {
-			return MakeParamError(
-				append(path, "output"),
-				"field present but does not contain a string.",
-			)
+			return MakeMetaRootOutputWrongTypeError(append(path, "output"))
 		}
 
 		rootOutput = output
@@ -153,20 +143,14 @@ func (p *Params) parseMetaPairs(
 		pairs, ok := pairsRaw.([]any)
 
 		if !ok {
-			return MakeParamError(
-				append(path, "pairs"),
-				"field present but does not contain an array.",
-			)
+			return MakeMetaPairsWrongTypeError(append(path, "pairs"))
 		}
 
 		for i, pairRaw := range pairs {
 			entry, ok := pairRaw.(map[string]any)
 
 			if !ok {
-				return MakeParamError(
-					append(path, "pairs", i),
-					"field present but does not contain a map.",
-				)
+				return MakeMetaPairWrongTypeError(append(path, "pairs", i))
 			}
 
 			pair, err := parseMetaPair(entry,
@@ -185,17 +169,11 @@ func (p *Params) parseMetaPairs(
 		first := p.Pairs[0]
 
 		if first.Template == "" {
-			return MakeParamError(
-				append(first.Path, "template"),
-				"required field for multiple pairs missing.",
-			)
+			return MakeMetaRootTemplateMissingInMultipleError(append(first.Path, "template"))
 		}
 
 		if first.Output == "" {
-			return MakeParamError(
-				append(first.Path, "output"),
-				"required field for multiple pairs missing.",
-			)
+			return MakeMetaRootOutputMissingInMultipleError(append(first.Path, "output"))
 		}
 	}
 
@@ -210,37 +188,25 @@ func parseMetaPair(
 	templateRaw, ok := entry["template"]
 
 	if !ok {
-		return pair, MakeParamError(
-			append(path, "template"),
-			"required field missing.",
-		)
+		return pair, MakeMetaPairTemplateMissingError(append(path, "template"))
 	}
 
 	pair.Template, ok = templateRaw.(string)
 
 	if !ok {
-		return pair, MakeParamError(
-			append(path, "template"),
-			"field present but does not contain a string.",
-		)
+		return pair, MakeMetaPairTemplateWrongTypeError(append(path, "template"))
 	}
 
 	outputRaw, ok := entry["output"]
 
 	if !ok {
-		return pair, MakeParamError(
-			append(path, "output"),
-			"required field missing.",
-		)
+		return pair, MakeMetaPairOutputMissingError(append(path, "output"))
 	}
 
 	pair.Output, ok = outputRaw.(string)
 
 	if !ok {
-		return pair, MakeParamError(
-			append(path, "output"),
-			"field present but does not contain a string.",
-		)
+		return pair, MakeMetaPairOutputWrongTypeError(append(path, "output"))
 	}
 
 	pair.Path = path
@@ -256,20 +222,14 @@ func (p *Params) parseMetaPrompts(
 		prompt, ok := promptRaw.([]any)
 
 		if !ok {
-			return MakeParamError(
-				append(path, "prompts"),
-				"field present but does not contain an array.",
-			)
+			return MakeMetaPromptsWrongTypeError(append(path, "prompts"))
 		}
 
 		for i, entryRaw := range prompt {
 			entry, ok := entryRaw.(map[string]any)
 
 			if !ok {
-				return MakeParamError(
-					append(path, "prompts", i),
-					"field present but does not contain a map.",
-				)
+				return MakeMetaPromptWrongTypeError(append(path, "prompts", i))
 			}
 
 			prompt, err := parseMetaPrompt(entry,
@@ -299,19 +259,13 @@ func parseMetaPrompt(
 	nameRaw, ok := entry["name"]
 
 	if !ok {
-		return prompt, MakeParamError(
-			append(path, "name"),
-			"required field missing.",
-		)
+		return prompt, MakeMetaPromptNameMissingError(append(path, "name"))
 	}
 
 	name, ok := nameRaw.(string)
 
 	if !ok {
-		return prompt, MakeParamError(
-			append(path, "name"),
-			"field present but does not contain a string.",
-		)
+		return prompt, MakeMetaPromptNameWrongTypeError(append(path, "name"))
 	}
 
 	kindRaw, ok := entry["kind"]
@@ -323,20 +277,11 @@ func parseMetaPrompt(
 	kind, ok = kindRaw.(string)
 
 	if !ok {
-		return prompt, MakeParamError(
-			append(path, "kind"),
-			"field present but does not contain a string.",
-		)
+		return prompt, MakeMetaPromptKindWrongTypeError(append(path, "kind"))
 	}
 
 	if !slices.Contains(prompts.SupportedPromptKinds, kind) {
-		return prompt, MakeParamError(
-			append(path, "kind"),
-			fmt.Sprintf(
-				"field does not contain one of the allowed values: %v.",
-				prompts.SupportedPromptKinds,
-			),
-		)
+		return prompt, MakeMetaPromptKindInvalidError(append(path, "kind"))
 	}
 
 postKind:
@@ -350,10 +295,7 @@ postKind:
 	title, ok = titleRaw.(string)
 
 	if !ok {
-		return prompt, MakeParamError(
-			append(path, "title"),
-			"field present but does not contain a string.",
-		)
+		return prompt, MakeMetaPromptTitleWrongTypeError(append(path, "title"))
 	}
 
 postTitle:
@@ -365,19 +307,13 @@ postTitle:
 		optionsRaw, ok := entry["options"]
 
 		if !ok {
-			return prompt, MakeParamError(
-				append(path, "options"),
-				"required field for `select` missing.",
-			)
+			return prompt, MakeMetaPromptOptionsMissingError(append(path, "options"))
 		}
 
 		options, ok := optionsRaw.([]any)
 
 		if !ok {
-			return prompt, MakeParamError(
-				append(path, "options"),
-				"field present but does not contain an array.",
-			)
+			return prompt, MakeMetaPromptOptionsWrongTypeError(append(path, "options"))
 		}
 
 		var optionsNormalized []prompts.PromptSelectOption
@@ -395,19 +331,13 @@ postTitle:
 				var title string
 
 				if !ok {
-					return prompt, MakeParamError(
-						append(path, "options", i, "title"),
-						"required field missing.",
-					)
+					return prompt, MakeMetaPromptOptionTitleMissingError(append(path, "options", i, "title"))
 				}
 
 				title, ok = titleRaw.(string)
 
 				if !ok {
-					return prompt, MakeParamError(
-						append(path, "options", i, "title"),
-						"field present but does not contain a string.",
-					)
+					return prompt, MakeMetaPromptOptionTitleWrongTypeError(append(path, "options", i, "title"))
 				}
 
 				value, ok := optionMap["value"]
@@ -422,6 +352,8 @@ postTitle:
 						Value: value,
 					},
 				)
+			} else {
+				return prompt, MakeMetaPromptWrongTypeError(append(path, "options", i))
 			}
 		}
 
