@@ -3,7 +3,7 @@
 Generate files from templates.
 
 If you are looking for an usage example, look no further &mdash;
-Qveen uses itself: <https://github.com/veigaribo/qveen/tree/main/qveen>
+Qveen uses itself: <https://github.com/veigaribo/qveen/tree/main/qveen>.
 
 ## Parameters
 
