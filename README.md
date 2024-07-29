@@ -61,7 +61,8 @@ Almost\* every value in the parameter file may reference others using
 template syntax, however expansion is done only once, i.e. not
 recursively, and in three steps: first for the `meta.prompts` values,
 before actually performing the prompts, then for regular values outside
-of the `meta` table, and the for the remaining values in the `meta` table.
+of the `meta` table, and the for the remaining values in the `meta`
+table.
 
 \* `meta.prompts[].kind` is currently an exception and does not expand.
 
@@ -115,8 +116,8 @@ which means the contents should come from stdin.
   delimiter of actions in the templates from the default `{{`;
 - `--right-delim` / `-r`: Changes the string to use as the right
   delimiter of actions in the templates from the default `}}`.
-- `--overwrite` / `-y`: Skips the confirmation that Qveen would normally
-  require before writing over existing files.
+- `--overwrite` / `-y`: Skips the confirmation that Qveen would
+  normally require before writing over existing files.
 - `--help` / `-h`: Displays information and immediately exits.
 
 `--template` and `--output` will be expanded as templates in the same

@@ -3,8 +3,8 @@ package templates
 import (
 	"bytes"
 	"fmt"
+	"github.com/veigaribo/template"
 	"io"
-	"text/template"
 )
 
 var Funcs = template.FuncMap{

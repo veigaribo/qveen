@@ -1,5 +1,5 @@
-This file documents the functions and templates made available for users
-of Qveen.
+This file documents the template utilities made available for users of
+Qveen.
 
 In this document, a "character" means graphemes representable as a
 single Unicode code point.
@@ -217,4 +217,51 @@ as its argument;
 
 => FRUITS
 orange - pear - apple
+```
+
+# Trimmers
+
+Qveen utilises a modified template parser that recognizes the following
+extra trimmers:
+
+### ~
+
+This trimmer will only trim horizontal space characters, so not
+carriage return or line feed.
+
+```
+s := `
+	{{- "In the early days computers were much simpler."}}
+	{{~ "The various components of a system were developed together "}}
+	{{- "and, as a result, were quite balanced in their performance."}}
+`
+```
+
+### #
+
+- If this trimmer is on the left, it will seek whitespace until it
+finds something that is not whitespace. Then, if it was on a different
+line from where it started, it will leave that line's line break
+behind and consume the rest. If there was trailing whitespace in that
+line, it will be kept too.
+
+- If this trimmer is on the right, it will seek whitespace until it
+finds something that is not whitespace. Then, if it was on a different
+line from where it started, it will leave that line's whitespace behind
+and consume the rest.
+
+Made mainly to be used on control actions, where no output is produced.
+Allows for cleanly joining lines without much worry for whitespaces.
+
+```
+import (
+	{{# if $usesfmt #}}
+	"fmt"
+	{{# end #}}
+	"github.com/veigaribo/qveen/utils"
+	{{# if $usesfmt #}}
+	"github.com/veigaribo/qveen/prompts"
+	{{# end #}}
+	"strings"
+)
 ```

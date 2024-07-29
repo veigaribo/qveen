@@ -3,7 +3,7 @@ package templates
 import (
 	"bytes"
 	"errors"
-	"text/template"
+	"github.com/veigaribo/template"
 )
 
 // HACK: Allows reference to the current executing template.

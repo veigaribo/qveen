@@ -7,10 +7,14 @@ package {{.package}}
 // Please do not modify it directly.
 
 import (
-{{if $usesfmt}}	"fmt"
-{{end}}	"github.com/veigaribo/qveen/utils"
-{{if $usesfmt}}	"github.com/veigaribo/qveen/prompts"
-{{end}}	"strings"
+	{{# if $usesfmt #}}
+	"fmt"
+	{{# end #}}
+	"github.com/veigaribo/qveen/utils"
+	{{# if $usesfmt #}}
+	"github.com/veigaribo/qveen/prompts"
+	{{# end #}}
+	"strings"
 )
 
 type ParamError struct {
@@ -52,7 +56,11 @@ func Make{{$struct}}(path []any) {{$struct}} {
 	return {{$struct}}{
 		Err: MakeParamError(
 			path,
-			{{if .msgf}}fmt.Sprintf("{{.msgf}}", {{template "join" (map "tmpl" "param" "els" .msgp "sep" ", ")}}){{else}}"{{.msg}}"{{end}},
+			{{if .msgf -}}
+			fmt.Sprintf("{{.msgf}}", {{template "join" (map "tmpl" "param" "els" .msgp "sep" ", ")}})
+			{{- else -}}
+			"{{.msg}}"
+			{{- end}},
 		),
 	}
 }
