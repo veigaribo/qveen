@@ -130,24 +130,11 @@ qveen -l '<%=' -r '%>' -t templates/controller.ts.tmpl -o 'src/controllers/<%= k
 Templates are regular Go template files. The `.` object will be a map
 containing the values in the parameter file.
 
-The utility functions:
+Various functions and templates are provided for convenience. See
+<https://github.com/veigaribo/qveen/blob/main/docs/template_lib.md>
+for more.
 
-- `uppercase`: `for example` to `FOR EXAMPLE`;
-- `lowercase`: `FOR EXAMPLE` to `for example`;
-- `titlecase`: `for example` to `For Example`;
-- `sentencecase`: `for example` to `For example`
-- `pascalcase`: `for example` to `ForExample`;
-- `camelcase`: `for example` to `forExample`;
-- `snakecase`: `for example` to `for_example`;
-- `kebabcase`: `for example` to `for-example`;
-- `constcase`: `for example` to `FOR_EXAMPLE`;
-- `dotcase`: `for example` to `for.example`.
-
-are also provided. They work on the assumption that words are separated
-by spaces, and the programming-related ones work best when the input
-string is all lower case.
-
-They should all work fine for non-ASCII graphemes.
+> You can use `jq`!
 
 Example:
 

@@ -20,3 +20,13 @@ func TemplateMap(values ...any) (map[string]any, error) {
 
 	return m, nil
 }
+
+func TemplateList(values ...any) ([]any, error) {
+	s := make([]any, 0, len(values))
+
+	for _, value := range values {
+		s = append(s, value)
+	}
+
+	return s, nil
+}

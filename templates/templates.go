@@ -19,13 +19,14 @@ var Funcs = template.FuncMap{
 	"dotcase":      TemplateDotCase,
 	"sentencecase": TemplateSentenceCase,
 
-	"map": TemplateMap,
-
-	"err":  TemplateErr,
-	"tmpl": TemplateTmpl,
+	"map":  TemplateMap,
+	"list": TemplateList,
 
 	"jq1": TemplateJq1,
 	"jqn": TemplateJqN,
+
+	"err":  TemplateErr,
+	"tmpl": TemplateTmpl,
 }
 
 var LeftDelim string = ""

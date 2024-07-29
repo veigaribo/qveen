@@ -24,9 +24,7 @@ func TemplateTitleCase(str string) string {
 	for _, r := range str {
 		if unicode.IsSpace(r) {
 			shouldUp = true
-		}
-
-		if shouldUp {
+		} else if shouldUp {
 			r = unicode.ToTitle(r)
 			shouldUp = false
 		}
@@ -51,7 +49,7 @@ func TemplatePascalCase(str string) string {
 		}
 
 		if shouldUp {
-			r = unicode.ToUpper(r)
+			r = unicode.ToTitle(r)
 			shouldUp = false
 		}
 
@@ -75,7 +73,7 @@ func TemplateCamelCase(str string) string {
 		}
 
 		if shouldUp {
-			r = unicode.ToUpper(r)
+			r = unicode.ToTitle(r)
 			shouldUp = false
 		}
 
