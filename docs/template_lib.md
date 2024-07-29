@@ -56,7 +56,7 @@ Makes the first character of each word, except the first, title case,
 and removes every space. Other characters are not affected.
 
 ```
-{{pascalcase "In the early days computers were much simpler"}}
+{{pascalcase "in the early days computers were much simpler"}}
 
 => inTheEarlyDaysComputersWereMuchSimpler
 ```
@@ -67,7 +67,7 @@ Substitutes every space character for an `_`. Other characters are not
 affected.
 
 ```
-{{snakecase "In the early days computers were much simpler"}}
+{{snakecase "in the early days computers were much simpler"}}
 
 => in_the_early_days_computers_were_much_simpler
 ```
@@ -78,7 +78,7 @@ Substitutes every space character for a `-`. Other characters are not
 affected.
 
 ```
-{{kebabcase "In the early days computers were much simpler"}}
+{{kebabcase "in the early days computers were much simpler"}}
 
 => in-the-early-days-computers-were-much-simpler
 ```
@@ -89,7 +89,7 @@ Transforms every character to upper case and substitutes every space
 character for an `_`. Same as `uppercase` then `snakecase`.
 
 ```
-{{constcase "In the early days computers were much simpler"}}
+{{constcase "in the early days computers were much simpler"}}
 
 => IN_THE_EARLY_DAYS_COMPUTERS_WERE_MUCH_SIMPLER
 ```
@@ -100,7 +100,7 @@ Substitutes every space character for a `.`. Other characters are not
 affected.
 
 ```
-{{dotcase "In the early days computers were much simpler"}}
+{{dotcase "in the early days computers were much simpler"}}
 
 => in.the.early.days.computers.were.much.simpler
 ```
