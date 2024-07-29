@@ -224,7 +224,7 @@ orange - pear - apple
 Qveen utilises a modified template parser that recognizes the following
 extra trimmers:
 
-### ~
+### Horizontal trimmer `~`
 
 This trimmer will only trim horizontal space characters, so not
 carriage return or line feed.
@@ -237,7 +237,7 @@ s := `
 `
 ```
 
-### #
+### Vertical trimmer `#`
 
 - If this trimmer is on the left, it will seek whitespace until it
 finds something that is not whitespace. Then, if it was on a different
