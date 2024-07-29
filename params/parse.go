@@ -22,6 +22,10 @@ type Params struct {
 	Data   map[string]any
 	Pairs  []ParamsPair
 	Prompt []prompts.Prompt
+
+	TemplateLeftDelim  string
+	TemplateRightDelim string
+	TemplateCase       string
 }
 
 type ParseParamsOptions struct {
@@ -95,6 +99,42 @@ func (params *Params) ParseMeta(opts ParseParamsOptions) error {
 
 	if err != nil {
 		return err
+	}
+
+	leftDelimRaw, ok := meta["left_delim"]
+
+	if ok {
+		leftDelim, ok := leftDelimRaw.(string)
+
+		if !ok {
+			return MakeMetaLeftDelimWrongTypeError([]any{opts.MetaKey, "left_delim"})
+		}
+
+		params.TemplateLeftDelim = leftDelim
+	}
+
+	rightDelimRaw, ok := meta["right_delim"]
+
+	if ok {
+		rightDelim, ok := rightDelimRaw.(string)
+
+		if !ok {
+			return MakeMetaRightDelimWrongTypeError([]any{opts.MetaKey, "right_delim"})
+		}
+
+		params.TemplateRightDelim = rightDelim
+	}
+
+	caseRaw, ok := meta["case"]
+
+	if ok {
+		kase, ok := caseRaw.(string)
+
+		if !ok {
+			return MakeMetaCaseWrongTypeError([]any{opts.MetaKey, "case"})
+		}
+
+		params.TemplateCase = kase
 	}
 
 	return nil

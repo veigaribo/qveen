@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"unicode"
 
 	"github.com/veigaribo/qveen/params"
 	"github.com/veigaribo/qveen/prompts"
@@ -19,6 +20,10 @@ type RenderOptions struct {
 	MetaKey      string
 	PromptValues map[string]string
 	Overwrite    bool
+
+	TemplateLeftDelim  string
+	TemplateRightDelim string
+	TemplateCase       string
 }
 
 func Render(opts RenderOptions) {
@@ -42,6 +47,34 @@ func Render(opts RenderOptions) {
 		return
 	}
 
+	templateLeftDelim := utils.FirstOf(
+		opts.TemplateLeftDelim,
+		p.TemplateLeftDelim,
+	)
+
+	templates.LeftDelim = templateLeftDelim
+
+	templateRightDelim := utils.FirstOf(
+		opts.TemplateRightDelim,
+		p.TemplateRightDelim,
+	)
+
+	templates.RightDelim = templateRightDelim
+
+	templateCase := utils.FirstOf(opts.TemplateCase, p.TemplateCase)
+
+	switch templateCase {
+	case "turkish":
+		templates.Case = unicode.TurkishCase
+	case "azeri":
+		templates.Case = unicode.AzeriCase
+	case "":
+		break
+	default:
+		panic(fmt.Errorf("Invalid value for `case`: '%s'. Expected 'turkish' or 'azeri' (or empty).", templateCase))
+	}
+
+	templates.Init()
 	p.ExpandPromptParams(opts.MetaKey)
 
 	for i := range p.Prompt {

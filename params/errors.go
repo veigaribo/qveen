@@ -519,3 +519,66 @@ func (e MetaPromptOptionWrongTypeError) Error() string {
 func (e MetaPromptOptionWrongTypeError) Unwrap() error {
 	return e.Err
 }
+
+type MetaLeftDelimWrongTypeError struct {
+	Err ParamError
+}
+
+func MakeMetaLeftDelimWrongTypeError(path []any) MetaLeftDelimWrongTypeError {
+	return MetaLeftDelimWrongTypeError{
+		Err: MakeParamError(
+			path,
+			"field present but does not contain a string.",
+		),
+	}
+}
+
+func (e MetaLeftDelimWrongTypeError) Error() string {
+	return e.Err.Error()
+}
+
+func (e MetaLeftDelimWrongTypeError) Unwrap() error {
+	return e.Err
+}
+
+type MetaRightDelimWrongTypeError struct {
+	Err ParamError
+}
+
+func MakeMetaRightDelimWrongTypeError(path []any) MetaRightDelimWrongTypeError {
+	return MetaRightDelimWrongTypeError{
+		Err: MakeParamError(
+			path,
+			"field present but does not contain a string.",
+		),
+	}
+}
+
+func (e MetaRightDelimWrongTypeError) Error() string {
+	return e.Err.Error()
+}
+
+func (e MetaRightDelimWrongTypeError) Unwrap() error {
+	return e.Err
+}
+
+type MetaCaseWrongTypeError struct {
+	Err ParamError
+}
+
+func MakeMetaCaseWrongTypeError(path []any) MetaCaseWrongTypeError {
+	return MetaCaseWrongTypeError{
+		Err: MakeParamError(
+			path,
+			"field present but does not contain a string.",
+		),
+	}
+}
+
+func (e MetaCaseWrongTypeError) Error() string {
+	return e.Err.Error()
+}
+
+func (e MetaCaseWrongTypeError) Unwrap() error {
+	return e.Err
+}

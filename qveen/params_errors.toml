@@ -93,6 +93,18 @@ msg = "field present but does not contain a string."
 name = "MetaPromptOptionWrongType"
 msg = "field present but contains neither a string nor a table."
 
+[[errors]]
+name = "MetaLeftDelimWrongType"
+msg = "field present but does not contain a string."
+
+[[errors]]
+name = "MetaRightDelimWrongType"
+msg = "field present but does not contain a string."
+
+[[errors]]
+name = "MetaCaseWrongType"
+msg = "field present but does not contain a string."
+
 [meta]
 template = "qveen/params_errors.go.tmpl"
 output = "params/errors.go"

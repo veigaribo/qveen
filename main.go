@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/veigaribo/qveen/templates"
 )
 
 func catchPanic() {
@@ -53,6 +52,7 @@ func main() {
 	var metaKeyFlag string
 	var leftDelimFlag string
 	var rightDelimFlag string
+	var caseFlag string
 	var overwriteFlag bool
 
 	rootCmd := cobra.Command{
@@ -63,9 +63,6 @@ func main() {
 		Args: cobra.ExactArgs(1),
 
 		Run: func(cmd *cobra.Command, args []string) {
-			templates.LeftDelim = leftDelimFlag
-			templates.RightDelim = rightDelimFlag
-
 			opts := RenderOptions{
 				ParamsPath:   args[0],
 				TemplatePath: templatePathFlag,
@@ -73,6 +70,10 @@ func main() {
 				MetaKey:      metaKeyFlag,
 				PromptValues: promptValueFlags,
 				Overwrite:    overwriteFlag,
+
+				TemplateLeftDelim:  leftDelimFlag,
+				TemplateRightDelim: rightDelimFlag,
+				TemplateCase:       caseFlag,
 			}
 
 			Render(opts)
@@ -129,6 +130,14 @@ func main() {
 			ParameterName: "delim",
 			Target:        &rightDelimFlag,
 			Description:   "String to use as the right delimiter for the template instead of `}}`.",
+		},
+		{
+			Type:          StringFlagType,
+			Short:         "c",
+			Long:          "case",
+			ParameterName: "turkish | azeri",
+			Target:        &caseFlag,
+			Description:   "Will use the corresponding casing rules in templates if set.",
 		},
 		{
 			Type:        BoolFlagType,

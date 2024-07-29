@@ -34,7 +34,7 @@ var RightDelim string = ""
 
 var baseTemplate *template.Template
 
-func init() {
+func Init() {
 	var err error
 
 	baseTemplate = template.

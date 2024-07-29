@@ -6,12 +6,15 @@ import (
 	"unicode/utf8"
 )
 
+var NotSpecialCase unicode.SpecialCase = unicode.SpecialCase{}
+var Case unicode.SpecialCase = NotSpecialCase
+
 func TemplateUpperCase(str string) string {
-	return strings.ToUpper(str)
+	return strings.ToUpperSpecial(Case, str)
 }
 
 func TemplateLowerCase(str string) string {
-	return strings.ToLower(str)
+	return strings.ToLowerSpecial(Case, str)
 }
 
 // `str` should be separated by spaces.
@@ -25,7 +28,7 @@ func TemplateTitleCase(str string) string {
 		if unicode.IsSpace(r) {
 			shouldUp = true
 		} else if shouldUp {
-			r = unicode.ToTitle(r)
+			r = Case.ToTitle(r)
 			shouldUp = false
 		}
 
@@ -49,7 +52,7 @@ func TemplatePascalCase(str string) string {
 		}
 
 		if shouldUp {
-			r = unicode.ToTitle(r)
+			r = Case.ToTitle(r)
 			shouldUp = false
 		}
 
@@ -73,7 +76,7 @@ func TemplateCamelCase(str string) string {
 		}
 
 		if shouldUp {
-			r = unicode.ToTitle(r)
+			r = Case.ToTitle(r)
 			shouldUp = false
 		}
 
@@ -124,7 +127,7 @@ func TemplateConstantCase(str string) string {
 		if unicode.IsSpace(r) {
 			builder.WriteRune('_')
 		} else {
-			builder.WriteRune(unicode.ToUpper(r))
+			builder.WriteRune(Case.ToUpper(r))
 		}
 	}
 
@@ -153,7 +156,7 @@ func TemplateSentenceCase(str string) string {
 	builder.Grow(len(str))
 
 	head, offset := utf8.DecodeRuneInString(str)
-	builder.WriteRune(unicode.ToTitle(head))
+	builder.WriteRune(Case.ToTitle(head))
 	builder.WriteString(str[offset:])
 
 	return builder.String()
