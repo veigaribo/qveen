@@ -147,6 +147,11 @@ int main() {
 }
 ```
 
+## Qveen uses Qveen!
+
+If you are looking for an usage example, look no further &mdash;
+Qveen uses Qveen: <https://github.com/veigaribo/qveen/tree/main/qveen>
+
 ## Disclaimer
 
 This project is in early development and is thus likely to contain bugs.
