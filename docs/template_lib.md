@@ -4,8 +4,8 @@ of Qveen.
 In this document, a "character" means graphemes representable as a
 single Unicode code point.
 
-A "word" is defined as something that follows a space (as defined by
-Unicode) or the start of the string.
+A "word" is defined as a sequence of characters that does not contain a
+space.
 
 If you don't know what a character being "title case" means, read it as
 "upper case".
