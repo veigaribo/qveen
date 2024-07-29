@@ -1,7 +1,7 @@
 This file documents the template utilities made available for users of
 Qveen.
 
-In this document, a "character" means graphemes representable as a
+In this document, a "character" mean a grapheme representable as a
 single Unicode code point.
 
 A "word" is defined as a sequence of characters that does not contain a
