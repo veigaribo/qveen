@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"regexp"
-	"strings"
 
 	"github.com/veigaribo/qveen/prompts"
 )
@@ -32,17 +31,22 @@ func IsUrl(path string) bool {
 	return urlRegexp.MatchString(path)
 }
 
-func IsLocalFile(path string) bool {
+func IsLocal(path string) bool {
 	return !IsStd(path) && !IsUrl(path)
 }
 
 func IsExplicitDir(path string) bool {
-	return strings.HasSuffix(path, "/") && IsLocalFile(path)
+	end := path[len(path)-1]
+	return (end == os.PathSeparator || end == '/') && IsLocal(path)
 }
 
 func OpenFileOrUrl(path string) (io.Reader, error) {
 	if path == "" {
 		return nil, errors.New("Tried to open an empty file path")
+	}
+
+	if IsStd(path) {
+		return os.Stdin, nil // Since it's for reading, assume stdin
 	}
 
 	if IsUrl(path) {
@@ -53,15 +57,14 @@ func OpenFileOrUrl(path string) (io.Reader, error) {
 		}
 
 		return resp.Body, nil
-	} else {
-		if IsLocalFile(path) {
-			return os.Open(path)
-		} else if IsStd(path) {
-			return os.Stdin, nil // Since it's for reading, assume stdin
-		} else {
-			return nil, fmt.Errorf("Tried to open directory '%s' like a file", path)
-		}
 	}
+
+	// Tautology.
+	if IsLocal(path) {
+		return os.Open(path)
+	}
+
+	return nil, nil // Unreachable.
 }
 
 var ErrAborted = errors.New("Aborted by user")
@@ -71,7 +74,7 @@ func FileWriter(path string, skipConfirm bool) (io.Writer, error) {
 		return nil, errors.New("Tried to write to an empty file path")
 	}
 
-	if IsLocalFile(path) {
+	if IsLocal(path) {
 		var stat fs.FileInfo
 		var err error
 
@@ -84,7 +87,7 @@ func FileWriter(path string, skipConfirm bool) (io.Writer, error) {
 
 		if err == nil {
 			if stat.IsDir() {
-				goto ok
+				return nil, fmt.Errorf("Destination '%s' already exists and is a directory", path)
 			}
 
 			overwrite := prompts.AskConfirm(
