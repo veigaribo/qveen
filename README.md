@@ -2,6 +2,9 @@
 
 Generate files from templates.
 
+If you are looking for an usage example, look no further &mdash;
+Qveen uses itself: <https://github.com/veigaribo/qveen/tree/main/qveen>
+
 ## Parameters
 
 Generation is done based on parameter files. A parameter file should
@@ -146,11 +149,6 @@ int main() {
     return {{.status}};
 }
 ```
-
-## Qveen uses Qveen!
-
-If you are looking for an usage example, look no further &mdash;
-Qveen uses Qveen: <https://github.com/veigaribo/qveen/tree/main/qveen>
 
 ## Disclaimer
 
