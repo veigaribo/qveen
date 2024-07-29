@@ -56,7 +56,7 @@ Makes the first character of each word, except the first, title case,
 and removes every space. Other characters are not affected.
 
 ```
-{{pascalcase "in the early days computers were much simpler"}}
+{{camelcase "in the early days computers were much simpler"}}
 
 => inTheEarlyDaysComputersWereMuchSimpler
 ```
