@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/veigaribo/template"
-	"io"
 )
 
 var Funcs = template.FuncMap{
@@ -25,8 +24,7 @@ var Funcs = template.FuncMap{
 	"jq1": TemplateJq1,
 	"jqn": TemplateJqN,
 
-	"err":  TemplateErr,
-	"tmpl": TemplateTmpl,
+	"err": TemplateErr,
 }
 
 var LeftDelim string = ""
@@ -55,27 +53,8 @@ func Init() {
 	}
 }
 
-type WrappedTemplate struct {
-	Template *template.Template
-}
-
-func (w WrappedTemplate) Parse(text string) (WrappedTemplate, error) {
-	t, err := w.Template.Parse(text)
-	return WrappedTemplate{t}, err
-}
-
-func (w WrappedTemplate) Execute(wr io.Writer, data any) error {
-	// HACK: Allows for nested template expansions that are not usually
-	// possible.
-	CurrentTemplate = w.Template
-	err := w.Template.Execute(wr, data)
-	CurrentTemplate = nil
-
-	return err
-}
-
-func GetTemplate() WrappedTemplate {
-	return WrappedTemplate{template.Must(baseTemplate.Clone())}
+func GetTemplate() *template.Template {
+	return template.Must(baseTemplate.Clone())
 }
 
 func ExpandString(name, content string, data map[string]any) (string, error) {
