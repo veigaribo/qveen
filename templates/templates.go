@@ -18,6 +18,11 @@ var Funcs = template.FuncMap{
 	"dotcase":      TemplateDotCase,
 	"sentencecase": TemplateSentenceCase,
 
+	"escapebackslash": EscapeBackslash,
+	"escapedouble":    EscapeDouble,
+	"escapehtml":      EscapeHtml,
+	"repl":            Replace,
+
 	"map":  TemplateMap,
 	"list": TemplateList,
 

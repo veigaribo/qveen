@@ -1,3 +1,7 @@
+{{- define "strescape" -}}
+{{ . | escapebackslash "\\\"" | repl "\n" "\\n" }}
+{{- end -}}
+
 {{- $usesfmt := jq1 ".errors[].msgf | strings" . -}}
 
 package {{.package}}
@@ -57,9 +61,9 @@ func Make{{$struct}}(path []any) {{$struct}} {
 		Err: MakeParamError(
 			path,
 			{{if .msgf -}}
-			fmt.Sprintf("{{.msgf}}", {{template "join" (map "tmpl" "param" "els" .msgp "sep" ", ")}})
+			fmt.Sprintf("{{template "strescape" .msgf}}", {{template "join" (map "tmpl" "param" "els" .msgp "sep" ", ")}})
 			{{- else -}}
-			"{{.msg}}"
+			"{{template "strescape" .msg}}"
 			{{- end}},
 		),
 	}
