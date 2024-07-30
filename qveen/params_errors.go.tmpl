@@ -1,4 +1,4 @@
-{{- define "strescape" -}}
+{{- def "strescape" -}}
 {{ . | escapebackslash "\\\"" | repl "\n" "\\n" }}
 {{- end -}}
 
@@ -47,9 +47,9 @@ func (e ParamError) Error() string {
 
 // Specific errors for use with `errors.As`.
 
-{{- define "param" -}}{{.}}{{- end -}}
+{{- def "param" -}}{{.}}{{- end -}}
 
-{{- define "err" -}}
+{{- def "err" -}}
 {{- $struct := printf "%sError" .name -}}
 
 type {{$struct}} struct {
@@ -61,9 +61,9 @@ func Make{{$struct}}(path []any) {{$struct}} {
 		Err: MakeParamError(
 			path,
 			{{if .msgf -}}
-			fmt.Sprintf("{{template "strescape" .msgf}}", {{template "join" (map "tmpl" "param" "els" .msgp "sep" ", ")}})
+			fmt.Sprintf("{{t "strescape" .msgf}}", {{t "join" (map "tmpl" "param" "els" .msgp "sep" ", ")}})
 			{{- else -}}
-			"{{template "strescape" .msg}}"
+			"{{t "strescape" .msg}}"
 			{{- end}},
 		),
 	}
@@ -77,4 +77,4 @@ func (e {{$struct}}) Unwrap() error {
 	return e.Err
 }{{- end -}}
 
-{{template "join" (map "tmpl" "err" "els" .errors "sep" "\n\n" "pre" "\n\n")}}
+{{t "join" (map "tmpl" "err" "els" .errors "sep" "\n\n" "pre" "\n\n")}}
