@@ -142,7 +142,10 @@ func Render(opts RenderOptions) {
 
 	for i, pair := range p.Pairs {
 		templatePathParams := pair.Template
-		templatePath := utils.FirstOf(templatePathFlag, templatePathParams)
+		templatePath := utils.FirstOf(
+			templatePathFlag,
+			templatePathParams.Resolve(opts.ParamsPath),
+		)
 
 		if templatePath == "" {
 			if isSinglePair {
@@ -181,7 +184,7 @@ func Render(opts RenderOptions) {
 		var outputPathParams = pair.Output
 
 		var outputLoc OutputLocation
-		outputLoc.Add(outputPathParams)
+		outputLoc.Add(outputPathParams.Resolve(opts.ParamsPath))
 		outputLoc.Add(outputPathFlag)
 
 		outputPath, err := outputLoc.Path()

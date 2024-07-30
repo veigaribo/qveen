@@ -66,7 +66,7 @@ func MakeMetaRootTemplateWrongTypeError(path []any) MetaRootTemplateWrongTypeErr
 	return MetaRootTemplateWrongTypeError{
 		Err: MakeParamError(
 			path,
-			"field present but does not contain a string.",
+			"field present but contains neither a string nor a table.",
 		),
 	}
 }
@@ -79,6 +79,90 @@ func (e MetaRootTemplateWrongTypeError) Unwrap() error {
 	return e.Err
 }
 
+type MetaRootTemplatePathMissingError struct {
+	Err ParamError
+}
+
+func MakeMetaRootTemplatePathMissingError(path []any) MetaRootTemplatePathMissingError {
+	return MetaRootTemplatePathMissingError{
+		Err: MakeParamError(
+			path,
+			"missing required field.",
+		),
+	}
+}
+
+func (e MetaRootTemplatePathMissingError) Error() string {
+	return e.Err.Error()
+}
+
+func (e MetaRootTemplatePathMissingError) Unwrap() error {
+	return e.Err
+}
+
+type MetaRootTemplatePathWrongTypeError struct {
+	Err ParamError
+}
+
+func MakeMetaRootTemplatePathWrongTypeError(path []any) MetaRootTemplatePathWrongTypeError {
+	return MetaRootTemplatePathWrongTypeError{
+		Err: MakeParamError(
+			path,
+			"field present but does not contain a string.",
+		),
+	}
+}
+
+func (e MetaRootTemplatePathWrongTypeError) Error() string {
+	return e.Err.Error()
+}
+
+func (e MetaRootTemplatePathWrongTypeError) Unwrap() error {
+	return e.Err
+}
+
+type MetaRootTemplateFromWrongTypeError struct {
+	Err ParamError
+}
+
+func MakeMetaRootTemplateFromWrongTypeError(path []any) MetaRootTemplateFromWrongTypeError {
+	return MetaRootTemplateFromWrongTypeError{
+		Err: MakeParamError(
+			path,
+			"field present but does not contain a string.",
+		),
+	}
+}
+
+func (e MetaRootTemplateFromWrongTypeError) Error() string {
+	return e.Err.Error()
+}
+
+func (e MetaRootTemplateFromWrongTypeError) Unwrap() error {
+	return e.Err
+}
+
+type MetaRootTemplateFromInvalidError struct {
+	Err ParamError
+}
+
+func MakeMetaRootTemplateFromInvalidError(path []any) MetaRootTemplateFromInvalidError {
+	return MetaRootTemplateFromInvalidError{
+		Err: MakeParamError(
+			path,
+			fmt.Sprintf("field does not contain one of the allowed values: '%s' or '%s'.", "params", "cwd"),
+		),
+	}
+}
+
+func (e MetaRootTemplateFromInvalidError) Error() string {
+	return e.Err.Error()
+}
+
+func (e MetaRootTemplateFromInvalidError) Unwrap() error {
+	return e.Err
+}
+
 type MetaRootOutputWrongTypeError struct {
 	Err ParamError
 }
@@ -87,7 +171,7 @@ func MakeMetaRootOutputWrongTypeError(path []any) MetaRootOutputWrongTypeError {
 	return MetaRootOutputWrongTypeError{
 		Err: MakeParamError(
 			path,
-			"field present but does not contain a string.",
+			"field present but contains neither a string nor a table.",
 		),
 	}
 }
@@ -97,6 +181,90 @@ func (e MetaRootOutputWrongTypeError) Error() string {
 }
 
 func (e MetaRootOutputWrongTypeError) Unwrap() error {
+	return e.Err
+}
+
+type MetaRootOutputPathMissingError struct {
+	Err ParamError
+}
+
+func MakeMetaRootOutputPathMissingError(path []any) MetaRootOutputPathMissingError {
+	return MetaRootOutputPathMissingError{
+		Err: MakeParamError(
+			path,
+			"missing required field.",
+		),
+	}
+}
+
+func (e MetaRootOutputPathMissingError) Error() string {
+	return e.Err.Error()
+}
+
+func (e MetaRootOutputPathMissingError) Unwrap() error {
+	return e.Err
+}
+
+type MetaRootOutputPathWrongTypeError struct {
+	Err ParamError
+}
+
+func MakeMetaRootOutputPathWrongTypeError(path []any) MetaRootOutputPathWrongTypeError {
+	return MetaRootOutputPathWrongTypeError{
+		Err: MakeParamError(
+			path,
+			"field present but does not contain a string.",
+		),
+	}
+}
+
+func (e MetaRootOutputPathWrongTypeError) Error() string {
+	return e.Err.Error()
+}
+
+func (e MetaRootOutputPathWrongTypeError) Unwrap() error {
+	return e.Err
+}
+
+type MetaRootOutputFromWrongTypeError struct {
+	Err ParamError
+}
+
+func MakeMetaRootOutputFromWrongTypeError(path []any) MetaRootOutputFromWrongTypeError {
+	return MetaRootOutputFromWrongTypeError{
+		Err: MakeParamError(
+			path,
+			"field present but does not contain a string.",
+		),
+	}
+}
+
+func (e MetaRootOutputFromWrongTypeError) Error() string {
+	return e.Err.Error()
+}
+
+func (e MetaRootOutputFromWrongTypeError) Unwrap() error {
+	return e.Err
+}
+
+type MetaRootOutputFromInvalidError struct {
+	Err ParamError
+}
+
+func MakeMetaRootOutputFromInvalidError(path []any) MetaRootOutputFromInvalidError {
+	return MetaRootOutputFromInvalidError{
+		Err: MakeParamError(
+			path,
+			fmt.Sprintf("field does not contain one of the allowed values: '%s' or '%s'.", "params", "cwd"),
+		),
+	}
+}
+
+func (e MetaRootOutputFromInvalidError) Error() string {
+	return e.Err.Error()
+}
+
+func (e MetaRootOutputFromInvalidError) Unwrap() error {
 	return e.Err
 }
 
@@ -213,7 +381,7 @@ func MakeMetaPairTemplateWrongTypeError(path []any) MetaPairTemplateWrongTypeErr
 	return MetaPairTemplateWrongTypeError{
 		Err: MakeParamError(
 			path,
-			"field present but does not contain a string.",
+			"field present but contains neither a string nor a table.",
 		),
 	}
 }
@@ -223,6 +391,90 @@ func (e MetaPairTemplateWrongTypeError) Error() string {
 }
 
 func (e MetaPairTemplateWrongTypeError) Unwrap() error {
+	return e.Err
+}
+
+type MetaPairTemplatePathMissingError struct {
+	Err ParamError
+}
+
+func MakeMetaPairTemplatePathMissingError(path []any) MetaPairTemplatePathMissingError {
+	return MetaPairTemplatePathMissingError{
+		Err: MakeParamError(
+			path,
+			"missing required field.",
+		),
+	}
+}
+
+func (e MetaPairTemplatePathMissingError) Error() string {
+	return e.Err.Error()
+}
+
+func (e MetaPairTemplatePathMissingError) Unwrap() error {
+	return e.Err
+}
+
+type MetaPairTemplatePathWrongTypeError struct {
+	Err ParamError
+}
+
+func MakeMetaPairTemplatePathWrongTypeError(path []any) MetaPairTemplatePathWrongTypeError {
+	return MetaPairTemplatePathWrongTypeError{
+		Err: MakeParamError(
+			path,
+			"field present but does not contain a string.",
+		),
+	}
+}
+
+func (e MetaPairTemplatePathWrongTypeError) Error() string {
+	return e.Err.Error()
+}
+
+func (e MetaPairTemplatePathWrongTypeError) Unwrap() error {
+	return e.Err
+}
+
+type MetaPairTemplateFromWrongTypeError struct {
+	Err ParamError
+}
+
+func MakeMetaPairTemplateFromWrongTypeError(path []any) MetaPairTemplateFromWrongTypeError {
+	return MetaPairTemplateFromWrongTypeError{
+		Err: MakeParamError(
+			path,
+			"field present but does not contain a string.",
+		),
+	}
+}
+
+func (e MetaPairTemplateFromWrongTypeError) Error() string {
+	return e.Err.Error()
+}
+
+func (e MetaPairTemplateFromWrongTypeError) Unwrap() error {
+	return e.Err
+}
+
+type MetaPairTemplateFromInvalidError struct {
+	Err ParamError
+}
+
+func MakeMetaPairTemplateFromInvalidError(path []any) MetaPairTemplateFromInvalidError {
+	return MetaPairTemplateFromInvalidError{
+		Err: MakeParamError(
+			path,
+			fmt.Sprintf("field does not contain one of the allowed values: '%s' or '%s'.", "params", "cwd"),
+		),
+	}
+}
+
+func (e MetaPairTemplateFromInvalidError) Error() string {
+	return e.Err.Error()
+}
+
+func (e MetaPairTemplateFromInvalidError) Unwrap() error {
 	return e.Err
 }
 
@@ -255,7 +507,7 @@ func MakeMetaPairOutputWrongTypeError(path []any) MetaPairOutputWrongTypeError {
 	return MetaPairOutputWrongTypeError{
 		Err: MakeParamError(
 			path,
-			"field present but does not contain a string.",
+			"field present but contains neither a string nor a table.",
 		),
 	}
 }
@@ -265,6 +517,90 @@ func (e MetaPairOutputWrongTypeError) Error() string {
 }
 
 func (e MetaPairOutputWrongTypeError) Unwrap() error {
+	return e.Err
+}
+
+type MetaPairOutputPathMissingError struct {
+	Err ParamError
+}
+
+func MakeMetaPairOutputPathMissingError(path []any) MetaPairOutputPathMissingError {
+	return MetaPairOutputPathMissingError{
+		Err: MakeParamError(
+			path,
+			"missing required field.",
+		),
+	}
+}
+
+func (e MetaPairOutputPathMissingError) Error() string {
+	return e.Err.Error()
+}
+
+func (e MetaPairOutputPathMissingError) Unwrap() error {
+	return e.Err
+}
+
+type MetaPairOutputPathWrongTypeError struct {
+	Err ParamError
+}
+
+func MakeMetaPairOutputPathWrongTypeError(path []any) MetaPairOutputPathWrongTypeError {
+	return MetaPairOutputPathWrongTypeError{
+		Err: MakeParamError(
+			path,
+			"field present but does not contain a string.",
+		),
+	}
+}
+
+func (e MetaPairOutputPathWrongTypeError) Error() string {
+	return e.Err.Error()
+}
+
+func (e MetaPairOutputPathWrongTypeError) Unwrap() error {
+	return e.Err
+}
+
+type MetaPairOutputFromWrongTypeError struct {
+	Err ParamError
+}
+
+func MakeMetaPairOutputFromWrongTypeError(path []any) MetaPairOutputFromWrongTypeError {
+	return MetaPairOutputFromWrongTypeError{
+		Err: MakeParamError(
+			path,
+			"field present but does not contain a string.",
+		),
+	}
+}
+
+func (e MetaPairOutputFromWrongTypeError) Error() string {
+	return e.Err.Error()
+}
+
+func (e MetaPairOutputFromWrongTypeError) Unwrap() error {
+	return e.Err
+}
+
+type MetaPairOutputFromInvalidError struct {
+	Err ParamError
+}
+
+func MakeMetaPairOutputFromInvalidError(path []any) MetaPairOutputFromInvalidError {
+	return MetaPairOutputFromInvalidError{
+		Err: MakeParamError(
+			path,
+			fmt.Sprintf("field does not contain one of the allowed values: '%s' or '%s'.", "params", "cwd"),
+		),
+	}
+}
+
+func (e MetaPairOutputFromInvalidError) Error() string {
+	return e.Err.Error()
+}
+
+func (e MetaPairOutputFromInvalidError) Unwrap() error {
 	return e.Err
 }
 

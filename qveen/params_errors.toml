@@ -6,11 +6,45 @@ msg = "field present but does not contain a table."
 
 [[errors]]
 name = "MetaRootTemplateWrongType"
+msg = "field present but contains neither a string nor a table."
+
+[[errors]]
+name = "MetaRootTemplatePathMissing"
+msg = "missing required field."
+
+[[errors]]
+name = "MetaRootTemplatePathWrongType"
 msg = "field present but does not contain a string."
 
 [[errors]]
-name = "MetaRootOutputWrongType"
+name = "MetaRootTemplateFromWrongType"
 msg = "field present but does not contain a string."
+
+[[errors]]
+name = "MetaRootTemplateFromInvalid"
+msgf = "field does not contain one of the allowed values: '%s' or '%s'."
+msgp = ["\"params\"", "\"cwd\""]
+
+[[errors]]
+name = "MetaRootOutputWrongType"
+msg = "field present but contains neither a string nor a table."
+
+[[errors]]
+name = "MetaRootOutputPathMissing"
+msg = "missing required field."
+
+[[errors]]
+name = "MetaRootOutputPathWrongType"
+msg = "field present but does not contain a string."
+
+[[errors]]
+name = "MetaRootOutputFromWrongType"
+msg = "field present but does not contain a string."
+
+[[errors]]
+name = "MetaRootOutputFromInvalid"
+msgf = "field does not contain one of the allowed values: '%s' or '%s'."
+msgp = ["\"params\"", "\"cwd\""]
 
 [[errors]]
 name = "MetaPairsWrongType"
@@ -34,7 +68,24 @@ msg = "missing required field."
 
 [[errors]]
 name = "MetaPairTemplateWrongType"
+msg = "field present but contains neither a string nor a table."
+
+[[errors]]
+name = "MetaPairTemplatePathMissing"
+msg = "missing required field."
+
+[[errors]]
+name = "MetaPairTemplatePathWrongType"
 msg = "field present but does not contain a string."
+
+[[errors]]
+name = "MetaPairTemplateFromWrongType"
+msg = "field present but does not contain a string."
+
+[[errors]]
+name = "MetaPairTemplateFromInvalid"
+msgf = "field does not contain one of the allowed values: '%s' or '%s'."
+msgp = ["\"params\"", "\"cwd\""]
 
 [[errors]]
 name = "MetaPairOutputMissing"
@@ -42,7 +93,24 @@ msg = "missing required field."
 
 [[errors]]
 name = "MetaPairOutputWrongType"
+msg = "field present but contains neither a string nor a table."
+
+[[errors]]
+name = "MetaPairOutputPathMissing"
+msg = "missing required field."
+
+[[errors]]
+name = "MetaPairOutputPathWrongType"
 msg = "field present but does not contain a string."
+
+[[errors]]
+name = "MetaPairOutputFromWrongType"
+msg = "field present but does not contain a string."
+
+[[errors]]
+name = "MetaPairOutputFromInvalid"
+msgf = "field does not contain one of the allowed values: '%s' or '%s'."
+msgp = ["\"params\"", "\"cwd\""]
 
 [[errors]]
 name = "MetaPromptsWrongType"
@@ -106,5 +174,5 @@ name = "MetaCaseWrongType"
 msg = "field present but does not contain a string."
 
 [meta]
-template = "qveen/params_errors.go.tmpl"
-output = "params/errors.go"
+template = {path = "params_errors.go.tmpl", from = "params"}
+output = {path = "../params/errors.go", from = "params"}

@@ -129,9 +129,9 @@ func (p *Params) ExpandParams(metaKey string) error {
 			return utils.PathString(append(pair.Path, field))
 		}
 
-		pair.Template, err = templates.ExpandString(
+		pair.Template.Path, err = templates.ExpandString(
 			metaTemplateName("template"),
-			pair.Template,
+			pair.Template.Path,
 			p.Data,
 		)
 
@@ -139,9 +139,9 @@ func (p *Params) ExpandParams(metaKey string) error {
 			return err
 		}
 
-		pair.Output, err = templates.ExpandString(
+		pair.Output.Path, err = templates.ExpandString(
 			metaTemplateName("output"),
-			pair.Output,
+			pair.Output.Path,
 			p.Data,
 		)
 

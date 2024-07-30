@@ -2,15 +2,46 @@ package params
 
 import (
 	"io"
+	"path"
 	"slices"
 
 	"github.com/pelletier/go-toml/v2"
 	"github.com/veigaribo/qveen/prompts"
 )
 
+type ParamsPathFrom = uint
+
+const (
+	ParamsPathFromCwd ParamsPathFrom = iota
+	ParamsPathFromParams
+)
+
+type ParamsPath struct {
+	Path string
+	From ParamsPathFrom
+}
+
+func (pp ParamsPath) IsEmpty() bool {
+	return pp.Path == ""
+}
+
+func (pp ParamsPath) Resolve(pathToParams string) string {
+	if pp.IsEmpty() {
+		return ""
+	}
+
+	if pp.From == ParamsPathFromCwd {
+		return pp.Path
+	}
+
+	// Must be ParamsPathFromParams.
+	paramsDir := path.Dir(pathToParams)
+	return path.Join(paramsDir, pp.Path)
+}
+
 type ParamsPair struct {
-	Template string
-	Output   string
+	Template ParamsPath
+	Output   ParamsPath
 
 	// Because a pair may be found in multiple keys (`meta` or
 	// `meta.pairs[#]`), store it here so we can show appropriate
@@ -140,18 +171,36 @@ func (params *Params) ParseMeta(opts ParseParamsOptions) error {
 	return nil
 }
 
+// We need to explain the concept of variance to the compiler
+// apparently.
+func rerr[T error](f func([]any) T) func([]any) error {
+	return func(xs []any) error {
+		return f(xs)
+	}
+}
+
 func (p *Params) parseMetaPairs(
 	meta map[string]any, path []any,
 ) error {
-	var rootTemplate, rootOutput string
+	var rootTemplate, rootOutput ParamsPath
 
 	templateRaw, ok := meta["template"]
 
 	if ok {
-		template, ok := templateRaw.(string)
+		template, err := parsePath(
+			templateRaw,
+			append(path, "template"),
+			mkParsePathErrors{
+				WrongType:          rerr(MakeMetaRootTemplateWrongTypeError),
+				TablePathMissing:   rerr(MakeMetaRootTemplatePathMissingError),
+				TablePathWrongType: rerr(MakeMetaRootTemplatePathWrongTypeError),
+				TableFromWrongType: rerr(MakeMetaRootTemplateFromWrongTypeError),
+				TableFromInvalid:   rerr(MakeMetaRootTemplateFromInvalidError),
+			},
+		)
 
-		if !ok {
-			return MakeMetaRootTemplateWrongTypeError(append(path, "template"))
+		if err != nil {
+			return err
 		}
 
 		rootTemplate = template
@@ -160,16 +209,26 @@ func (p *Params) parseMetaPairs(
 	outputRaw, ok := meta["output"]
 
 	if ok {
-		output, ok := outputRaw.(string)
+		output, err := parsePath(
+			outputRaw,
+			append(path, "output"),
+			mkParsePathErrors{
+				WrongType:          rerr(MakeMetaRootOutputWrongTypeError),
+				TablePathMissing:   rerr(MakeMetaRootOutputPathMissingError),
+				TablePathWrongType: rerr(MakeMetaRootOutputPathWrongTypeError),
+				TableFromWrongType: rerr(MakeMetaRootOutputFromWrongTypeError),
+				TableFromInvalid:   rerr(MakeMetaRootOutputFromInvalidError),
+			},
+		)
 
-		if !ok {
-			return MakeMetaRootOutputWrongTypeError(append(path, "output"))
+		if err != nil {
+			return err
 		}
 
 		rootOutput = output
 	}
 
-	if rootTemplate != "" || rootOutput != "" {
+	if !rootTemplate.IsEmpty() || !rootOutput.IsEmpty() {
 		p.Pairs = append(p.Pairs, ParamsPair{
 			Template: rootTemplate,
 			Output:   rootOutput,
@@ -208,11 +267,11 @@ func (p *Params) parseMetaPairs(
 	if len(p.Pairs) > 1 {
 		first := p.Pairs[0]
 
-		if first.Template == "" {
+		if first.Template.IsEmpty() {
 			return MakeMetaRootTemplateMissingInMultipleError(append(first.Path, "template"))
 		}
 
-		if first.Output == "" {
+		if first.Output.IsEmpty() {
 			return MakeMetaRootOutputMissingInMultipleError(append(first.Path, "output"))
 		}
 	}
@@ -224,6 +283,7 @@ func parseMetaPair(
 	entry map[string]any, path []any,
 ) (ParamsPair, error) {
 	var pair ParamsPair
+	var err error
 
 	templateRaw, ok := entry["template"]
 
@@ -231,10 +291,20 @@ func parseMetaPair(
 		return pair, MakeMetaPairTemplateMissingError(append(path, "template"))
 	}
 
-	pair.Template, ok = templateRaw.(string)
+	pair.Template, err = parsePath(
+		templateRaw,
+		append(path, "template"),
+		mkParsePathErrors{
+			WrongType:          rerr(MakeMetaPairTemplateWrongTypeError),
+			TablePathMissing:   rerr(MakeMetaPairTemplatePathMissingError),
+			TablePathWrongType: rerr(MakeMetaPairTemplatePathWrongTypeError),
+			TableFromWrongType: rerr(MakeMetaPairTemplateFromWrongTypeError),
+			TableFromInvalid:   rerr(MakeMetaPairTemplateFromInvalidError),
+		},
+	)
 
-	if !ok {
-		return pair, MakeMetaPairTemplateWrongTypeError(append(path, "template"))
+	if err != nil {
+		return pair, err
 	}
 
 	outputRaw, ok := entry["output"]
@@ -243,11 +313,17 @@ func parseMetaPair(
 		return pair, MakeMetaPairOutputMissingError(append(path, "output"))
 	}
 
-	pair.Output, ok = outputRaw.(string)
-
-	if !ok {
-		return pair, MakeMetaPairOutputWrongTypeError(append(path, "output"))
-	}
+	pair.Output, err = parsePath(
+		outputRaw,
+		append(path, "output"),
+		mkParsePathErrors{
+			WrongType:          rerr(MakeMetaPairOutputWrongTypeError),
+			TablePathMissing:   rerr(MakeMetaPairOutputPathMissingError),
+			TablePathWrongType: rerr(MakeMetaPairOutputPathWrongTypeError),
+			TableFromWrongType: rerr(MakeMetaPairOutputFromWrongTypeError),
+			TableFromInvalid:   rerr(MakeMetaPairOutputFromInvalidError),
+		},
+	)
 
 	pair.Path = path
 	return pair, nil
@@ -407,4 +483,74 @@ postTitle:
 	prompt.Title = title
 	prompt.Specific = specific
 	return prompt, nil
+}
+
+type mkParsePathErrors struct {
+	WrongType          func(path []any) error
+	TablePathMissing   func(path []any) error
+	TablePathWrongType func(path []any) error
+	TableFromWrongType func(path []any) error
+	TableFromInvalid   func(path []any) error
+}
+
+func parsePath(
+	obj any,
+	path []any,
+	mkerr mkParsePathErrors,
+) (ParamsPath, error) {
+
+	result := ParamsPath{
+		From: ParamsPathFromCwd,
+	}
+
+	var ok bool
+
+	result.Path, ok = obj.(string)
+
+	if ok {
+		return result, nil
+	}
+
+	m, ok := obj.(map[string]any)
+
+	if !ok {
+		return result, mkerr.WrongType(path)
+	}
+
+	pathRaw, ok := m["path"]
+
+	if !ok {
+		return result, mkerr.TablePathMissing(append(path, "path"))
+	}
+
+	result.Path, ok = pathRaw.(string)
+
+	if !ok {
+		return result, mkerr.TablePathWrongType(append(path, "path"))
+	}
+
+	fromRaw, ok := m["from"]
+	var from string
+
+	if !ok {
+		goto postFrom
+	}
+
+	from, ok = fromRaw.(string)
+
+	if !ok {
+		return result, mkerr.TableFromWrongType(append(path, "from"))
+	}
+
+	switch from {
+	case "params":
+		result.From = ParamsPathFromParams
+	case "cwd":
+		result.From = ParamsPathFromCwd
+	default:
+		return result, mkerr.TableFromInvalid(append(path, "from"))
+	}
+
+postFrom:
+	return result, nil
 }
