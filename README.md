@@ -189,7 +189,7 @@ struct tile {
 };
 
 struct field {
-  tiles tile[8 * 8];
+  tiles struct tile[8 * 8];
 };
 
 int main() {
