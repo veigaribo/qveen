@@ -10,7 +10,7 @@ func TemplateJq1(query string, obj any) (any, error) {
 		return nil, err
 	}
 
-	iter := q.Run(prepareJq(obj))
+	iter := q.Run(resolvePointers(obj))
 
 	v, ok := iter.Next()
 	if !ok {
@@ -24,7 +24,7 @@ func TemplateJq1(query string, obj any) (any, error) {
 		return "", err
 	}
 
-	return v, nil
+	return PrepareData(v), nil
 }
 
 // Runs jq query and returns all results.
@@ -36,7 +36,7 @@ func TemplateJqN(query string, obj any) ([]any, error) {
 		return results, err
 	}
 
-	iter := q.Run(prepareJq(obj))
+	iter := q.Run(resolvePointers(obj))
 
 	for {
 		v, ok := iter.Next()
@@ -51,33 +51,8 @@ func TemplateJqN(query string, obj any) ([]any, error) {
 			return results, err
 		}
 
-		results = append(results, v)
+		results = append(results, PrepareData(v))
 	}
 
 	return results, nil
-}
-
-// The template works with pointers to containers. Need to convert them
-// before querying.
-func prepareJq(data any) any {
-	switch val := data.(type) {
-	case *[]any:
-		newSlice := make([]any, 0, len(*val))
-
-		for _, item := range *val {
-			newSlice = append(newSlice, prepareJq(item))
-		}
-
-		return newSlice
-	case *map[string]any:
-		newMap := make(map[string]any, len(*val))
-
-		for key, value := range *val {
-			newMap[key] = prepareJq(value)
-		}
-
-		return newMap
-	default:
-		return val
-	}
 }

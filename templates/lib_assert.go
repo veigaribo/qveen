@@ -1,7 +1,7 @@
 package templates
 
 func TemplateIsMap(val any) bool {
-	_, ok := val.(map[any]any)
+	_, ok := val.(*map[any]any)
 	return ok
 }
 
@@ -17,6 +17,6 @@ func TemplateIsInt(val any) bool {
 
 // Trying to use a language agnostic idiom.
 func TemplateIsArr(val any) bool {
-	_, ok := val.([]any)
+	_, ok := val.(*[]any)
 	return ok
 }

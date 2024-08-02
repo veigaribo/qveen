@@ -13,7 +13,7 @@ func TemplateToYaml(obj any) (string, error) {
 	var builder strings.Builder
 
 	encoder := yaml.NewEncoder(&builder)
-	err := encoder.Encode(obj)
+	err := encoder.Encode(resolvePointers(obj))
 
 	if err != nil {
 		return "", err
@@ -29,7 +29,7 @@ func TemplateToJson(obj any) (string, error) {
 	var builder strings.Builder
 
 	encoder := json.NewEncoder(&builder)
-	err := encoder.Encode(obj)
+	err := encoder.Encode(resolvePointers(obj))
 
 	if err != nil {
 		return "", err

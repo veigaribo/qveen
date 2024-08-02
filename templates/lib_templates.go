@@ -20,20 +20,20 @@ func TemplateDump(objs ...any) string {
 	}
 
 	head = objs[0]
-	fmt.Print(dump(head))
+	fmt.Fprint(os.Stderr, dump(head))
 
 	for _, obj := range objs[1:] {
-		fmt.Print(" ")
-		fmt.Print(dump(obj))
+		fmt.Fprint(os.Stderr, " ")
+		fmt.Fprint(os.Stderr, dump(obj))
 	}
 
 wrapup:
-	fmt.Print("\n")
+	fmt.Fprint(os.Stderr, "\n")
 	return ""
 }
 
 func TemplateProbe(obj any) any {
-	fmt.Fprintln(os.Stderr, obj)
+	fmt.Fprintln(os.Stderr, dump(obj))
 	return obj
 }
 
@@ -116,5 +116,5 @@ func dump(x any) string {
 		}
 	}
 
-	return "Unrecognized(" + fmt.Sprint(x) + ")"
+	return fmt.Sprintf("Unrecognized<%[1]T>(%[1]q)", x)
 }

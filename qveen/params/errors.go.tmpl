@@ -58,10 +58,6 @@
 
 {{- /* Write Go. */ -}}
 
-{{- def "strescape" -}}
-{{- . | escapebackslash "\\\"" | repl "\n" "\\n" -}}
-{{- end -}}
-
 {{- $usesfmt := jq1 ".[].msgf | strings" $errors -}}
 
 package {{.package}}
@@ -106,8 +102,6 @@ func (e ParamError) Error() string {
 
 // Specific errors for use with `errors.As`.
 
-{{- def "param" -}}{{.}}{{- end -}}
-
 {{- def "err" -}}
 {{- $struct := printf "%sError" .name -}}
 
@@ -120,9 +114,9 @@ func Make{{$struct}}(path []any) {{$struct}} {
 		Err: MakeParamError(
 			path,
 			{{if .msgf -}}
-			fmt.Sprintf("{{t "strescape" .msgf}}", {{t "join" (map "tmpl" "param" "els" .msgp "sep" ", ")}})
+			fmt.Sprintf({{json .msgf}}, {{join .msgp ", "}})
 			{{- else -}}
-			"{{t "strescape" .msg}}"
+			{{json .msg}}
 			{{- end}},
 		),
 	}
@@ -134,6 +128,6 @@ func (e {{$struct}}) Error() string {
 
 func (e {{$struct}}) Unwrap() error {
 	return e.Err
-}{{- end -}}
+}{{- end -}} {{- /* def "err" */ -}}
 
 {{t "join" (map "tmpl" "err" "els" $errors "sep" "\n\n" "pre" "\n\n")}}

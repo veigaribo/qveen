@@ -14,7 +14,7 @@ func TemplateToToml(obj any) (string, error) {
 	encoder := toml.NewEncoder(&builder)
 	encoder.SetIndentTables(false)
 
-	err := encoder.Encode(obj)
+	err := encoder.Encode(resolvePointers(obj))
 
 	if err != nil {
 		return "", err

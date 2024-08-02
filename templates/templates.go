@@ -84,7 +84,7 @@ func GetTemplate() *template.Template {
 	return template.Must(baseTemplate.Clone())
 }
 
-// Convertes containers to pointers to containers.
+// Converts containers to pointers to containers.
 func PrepareData(data any) any {
 	switch val := data.(type) {
 	case []any:
@@ -96,7 +96,7 @@ func PrepareData(data any) any {
 
 		return &newSlice
 	case map[string]any:
-		newMap := make(map[string]any, len(val))
+		newMap := make(map[string]any)
 
 		for key, value := range val {
 			newMap[key] = PrepareData(value)
@@ -128,4 +128,30 @@ func ExpandString(name, content string, data map[string]any) (string, error) {
 	}
 
 	return buffer.String(), nil
+}
+
+// The template works with pointers to containers. Often we need to
+// convert to embedded containers. Should do the opposite of
+// `PrepareData`.
+func resolvePointers(data any) any {
+	switch val := data.(type) {
+	case *[]any:
+		newSlice := make([]any, 0, len(*val))
+
+		for _, item := range *val {
+			newSlice = append(newSlice, resolvePointers(item))
+		}
+
+		return newSlice
+	case *map[string]any:
+		newMap := make(map[string]any)
+
+		for key, value := range *val {
+			newMap[key] = resolvePointers(value)
+		}
+
+		return newMap
+	default:
+		return val
+	}
 }
