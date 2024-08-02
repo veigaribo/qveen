@@ -8,8 +8,12 @@ Qveen uses itself: <https://github.com/veigaribo/qveen/tree/main/qveen>.
 ## Parameters
 
 Generation is done based on parameter files. A parameter file should
-contain TOML and optionally a table with metadata, named `meta` by
-default.
+contain data in one of the supported formats, which currently are TOML
+and YAML (and therefore JSON) and optionally an object with metadata,
+named `meta` by default.
+
+The `meta` should be just a regular TOML table or YAML dictionary,
+depending on the chosen format.
 
 Files will be generated from templates with access to the values
 provided in the parameter file.
@@ -19,7 +23,12 @@ The `meta` table, if present, may contain the following entries:
 - `template`: A path to the Go template file to be expanded;
 - `output`: The file path in which to store the resulting file;
 - `pairs`: Pairs of templates and outputs;
-- `prompts`: A list of values to be provided interactively.
+- `prompts`: A list of values to be provided interactively;
+- `left_delim`: Left delimiter for templates, which by default is `{{`;
+- `right_delim`: Right delimiter for templates, which by default is
+  `{{`;
+- `case`: If set to `turkish` or `azeri`, the case-modifying template
+  functions will change the case appropriately.
 
 You can either provide `template` and `output` to process a single
 template or `pairs` to process multiple templates with the same data.
@@ -105,6 +114,10 @@ which means the contents should come from stdin.
   resulting file. May be a prefix, like `meta.output`. If it isn't, it
   will override `meta.output` if and only if processing a single
   template \* output pair;
+- `--format` / `-f`: When set to `toml`, will try to parse the
+  parameter file as TOML. When set to `yaml`, will try to parse the
+  parameter file as YAML. When left empty, the format will be
+  determined by the file extension, if possible;
 - `--prompt-value` / `-o`: Provides a value for a prompt. Example:
   `-p name="value"` will set the value `value` to the prompt named
   `name`. The value should be valid for the respective kind of prompt.
@@ -116,8 +129,11 @@ which means the contents should come from stdin.
   delimiter of actions in the templates from the default `{{`;
 - `--right-delim` / `-r`: Changes the string to use as the right
   delimiter of actions in the templates from the default `}}`.
+- `--case` / `-c`: If set to `turkish` or `azeri`, the template
+  functions that change case will do so in accordance with those
+  languages;
 - `--overwrite` / `-y`: Skips the confirmation that Qveen would
-  normally require before writing over existing files.
+  normally require before writing over existing files;
 - `--help` / `-h`: Displays information and immediately exits.
 
 `--template` and `--output` will be expanded as templates in the same
@@ -131,12 +147,12 @@ qveen -l '<%=' -r '%>' -t templates/controller.ts.tmpl -o 'src/controllers/<%= k
 
 ## Templates
 
-Templates are regular Go template files. The `.` object will be a map
+Templates are extended Go template files. The `.` object will be a map
 containing the values in the parameter file.
 
-Various functions and templates are provided for convenience. See
+See
 <https://github.com/veigaribo/qveen/blob/main/docs/template_lib.md>
-for more.
+for the available functions, templates and added features.
 
 > You can use `jq`!
 
@@ -145,21 +161,44 @@ Example:
 ``` c
 #include <{{dotcase "stdio h"}}>
 
+{{# /* How to generate each struct field. */ -}}
+{{- def "structfield" -}}
+{{.name}} {{.type}};
+{{- end #}}
+
+{{range .structs}}
+struct {{snakecase .name}} {
+  {{# /* Generate fields separated by "\n  ". */ #}}
+  {{t "join" (map "tmpl" "structfield" "els" .fields "sep" "\n  ")}}
+};
+{{end}}
 int main() {
     printf("{{uppercase .text}}!\n");
     return {{.status}};
 }
 ```
 
+Generates something like:
+
+``` c
+#include <stdio.h>
+
+struct tile {
+  x double;
+  y double;
+};
+
+struct field {
+  tiles tile[8 * 8];
+};
+
+int main() {
+    printf("HELLO WORLD!\n");
+    return 0;
+}
+```
+
 ## Disclaimer
 
-This project is in early development and is thus likely to contain bugs.
-Feel free to report them.
-
-### TODO
-
-- Allow usage of this project as a library;
-- Add more functions to templates, in particular for escaping;
-- Generate man page;
-- Document installation;
-- Include examples of usage patterns;
+This project is in early development and is thus likely to contain
+bugs. Feel free to report them.

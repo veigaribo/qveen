@@ -68,8 +68,8 @@ func TemplateAppend(s *[]any, value any) (string, error) {
 }
 
 func TemplateSlice(s *[]any, idx ...int) (*[]any, error) {
-	if len(idx) < 1 || len(idx) > 3 {
-		return nil, fmt.Errorf("`slice` expected between 1 and 3 indexes. Received %d (%v)", len(idx), idx)
+	if len(idx) < 1 || len(idx) > 2 {
+		return nil, fmt.Errorf("`slice` expected between 1 and 2 indexes. Received %d (%v)", len(idx), idx)
 	}
 
 	switch len(idx) {
@@ -78,9 +78,6 @@ func TemplateSlice(s *[]any, idx ...int) (*[]any, error) {
 		return &slice, nil
 	case 2:
 		slice := (*s)[idx[0]:idx[1]]
-		return &slice, nil
-	case 3:
-		slice := (*s)[idx[0]:idx[1]:idx[2]]
 		return &slice, nil
 	}
 
