@@ -47,6 +47,7 @@ func main() {
 
 	var templatePathFlag string
 	var outputPathFlag string
+	var formatFlag string
 	var promptValueFlags map[string]string
 
 	var metaKeyFlag string
@@ -65,6 +66,7 @@ func main() {
 		Run: func(cmd *cobra.Command, args []string) {
 			opts := RenderOptions{
 				ParamsPath:   args[0],
+				ParamsFormat: formatFlag,
 				TemplatePath: templatePathFlag,
 				OutputPath:   outputPathFlag,
 				MetaKey:      metaKeyFlag,
@@ -98,6 +100,14 @@ func main() {
 			ParameterName: "output-file",
 			Target:        &outputPathFlag,
 			Description:   "Destination file name (placeholders allowed).",
+		},
+		{
+			Type:          StringFlagType,
+			Short:         "f",
+			Long:          "format",
+			ParameterName: "toml | yaml",
+			Target:        &formatFlag,
+			Description:   "Set the parameter file format. Will check the extension by default.",
 		},
 		{
 			Type:          StringToStringType,

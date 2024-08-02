@@ -15,6 +15,7 @@ import (
 
 type RenderOptions struct {
 	ParamsPath   string
+	ParamsFormat string
 	TemplatePath string
 	OutputPath   string
 	MetaKey      string
@@ -33,16 +34,29 @@ func Render(opts RenderOptions) {
 		panic(fmt.Errorf("Failed to open parameter file: %w", err))
 	}
 
-	// TODO: Allow explicit definition.
-	format := params.GuessFormat(opts.ParamsPath)
+	var paramsFormat params.ParamsFormat
 
-	if format == nil {
-		panic(fmt.Errorf("Could not guess params format from file name: %s", opts.ParamsPath))
+	switch opts.ParamsFormat {
+	case "toml":
+		paramsFormat = params.ParamsTomlFormat
+	case "yaml":
+	case "json":
+		paramsFormat = params.ParamsYamlFormat
+	case "":
+		maybeParamsFormat := params.GuessFormat(opts.ParamsPath)
+
+		if maybeParamsFormat == nil {
+			panic(fmt.Errorf("Could not guess params format from file name: %s", opts.ParamsPath))
+		}
+
+		paramsFormat = *maybeParamsFormat
+	default:
+		panic(fmt.Errorf("Unrecognized format '%s'", opts.ParamsFormat))
 	}
 
 	p, err := params.ParseParams(
 		paramsReader,
-		*format,
+		paramsFormat,
 
 		params.ParseParamsOptions{
 			MetaKey: opts.MetaKey,
