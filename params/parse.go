@@ -1,12 +1,14 @@
 package params
 
 import (
+	"fmt"
 	"io"
 	"path"
 	"slices"
 
 	"github.com/pelletier/go-toml/v2"
 	"github.com/veigaribo/qveen/prompts"
+	"gopkg.in/yaml.v3"
 )
 
 type ParamsPathFrom = uint
@@ -59,12 +61,20 @@ type Params struct {
 	TemplateCase       string
 }
 
+type ParamsFormat string
+
+const (
+	ParamsTomlFormat ParamsFormat = "toml"
+	ParamsYamlFormat              = "yaml/json"
+)
+
 type ParseParamsOptions struct {
 	MetaKey string
 }
 
 func ParseParams(
 	input io.Reader,
+	format ParamsFormat,
 	opts ParseParamsOptions,
 ) (Params, error) {
 	if opts.MetaKey == "" {
@@ -74,7 +84,7 @@ func ParseParams(
 	var params Params
 	var err error
 
-	err = params.ParseGeneral(input)
+	err = params.ParseGeneral(input, format)
 
 	if err != nil {
 		return params, err
@@ -91,6 +101,7 @@ func ParseParams(
 
 func (params *Params) ParseGeneral(
 	input io.Reader,
+	format ParamsFormat,
 ) error {
 	bytes, err := io.ReadAll(input)
 
@@ -98,7 +109,14 @@ func (params *Params) ParseGeneral(
 		return err
 	}
 
-	err = toml.Unmarshal(bytes, &params.Data)
+	switch format {
+	case ParamsTomlFormat:
+		err = toml.Unmarshal(bytes, &params.Data)
+	case ParamsYamlFormat:
+		err = yaml.Unmarshal(bytes, &params.Data)
+	default:
+		panic(fmt.Errorf("Unrecognized format '%q'", format))
+	}
 
 	if err != nil {
 		return err

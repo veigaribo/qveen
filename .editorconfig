@@ -11,3 +11,6 @@ max_line_length = 72
 
 [README.md]
 indent_style = space
+
+[**.yaml]
+indent_style = space

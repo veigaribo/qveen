@@ -33,9 +33,21 @@ func Render(opts RenderOptions) {
 		panic(fmt.Errorf("Failed to open parameter file: %w", err))
 	}
 
-	p, err := params.ParseParams(paramsReader, params.ParseParamsOptions{
-		MetaKey: opts.MetaKey,
-	})
+	// TODO: Allow explicit definition.
+	format := params.GuessFormat(opts.ParamsPath)
+
+	if format == nil {
+		panic(fmt.Errorf("Could not guess params format from file name: %s", opts.ParamsPath))
+	}
+
+	p, err := params.ParseParams(
+		paramsReader,
+		*format,
+
+		params.ParseParamsOptions{
+			MetaKey: opts.MetaKey,
+		},
+	)
 
 	if err != nil {
 		panic(fmt.Errorf("Failed to parse parameter file: %w", err))
@@ -207,7 +219,7 @@ func Render(opts RenderOptions) {
 			}
 		}
 
-		err = t.Execute(output, p.Data)
+		err = t.Execute(output, templates.PrepareData(p.Data))
 
 		if err != nil {
 			if isSinglePair {

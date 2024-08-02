@@ -1,0 +1,98 @@
+---
+# This structure represents the name of each error. Each inner table's
+# name is concatenated with that of its parent. They need not resemble
+# the actual format at all. It is, for example, fine to mark an error
+# `_required` even if it is only sometimes required. All that will do
+# is create an error for it.
+#
+# Tables with a defined `_type` will get a WrongType error based on it.
+# If it contains `_required`, a Missing one will be generated too.
+# `_in` is given as argument to the `%v` of a generated Invalid error,
+# indicating what values are expected.
+
+package: "params"
+
+fields:
+  meta:
+    _type: "a table"
+    root:
+      template:
+        _type: ["a string", "a table"]
+        path:
+          _required: true
+          _type: "a string"
+        from:
+          _type: "a string"
+          _in: '[]string{"params", "cwd"}'
+      output:
+        _type: ["a string", "a table"]
+        path:
+          _required: true
+          _type: "a string"
+        from:
+          _type: "a string"
+          _in: '[]string{"params", "cwd"}'
+    pairs:
+      _type: "an array"
+    pair:
+      _type: "a table"
+      template:
+        _required: true
+        _type: ["a string", "a table"]
+        path:
+          _required: true
+          _type: "a string"
+        from:
+          _type: "a string"
+          _in: '[]string{"params", "cwd"}'
+      output:
+        _required: true
+        _type: ["a string", "a table"]
+        path:
+          _required: true
+          _type: "a string"
+        from:
+          _type: "a string"
+          _in: '[]string{"params", "cwd"}'
+    prompts:
+      _type: "an array"
+    prompt:
+      _type: "a table"
+      name:
+        _required: true
+        _type: "a string"
+      kind:
+        _type: "a string"
+        _in: "prompts.SupportedPromptKinds"
+      title:
+        _type: "a string"
+      options:
+        _required: true
+        _required_addendum: "required for `select`."
+        _type: "an array"
+      option:
+        _type: ["a string", "a table"]
+        title:
+          _required: true
+          _type: "a string"
+    "left delim":
+      _type: "a string"
+    "right delim":
+      _type: "a string"
+    case:
+      _type: "a string"
+
+# Extra not so easily generalizable errors.
+pluserrors:
+  - name: "MetaRootTemplateMissingInMultiple"
+    msg: "required field is required for multiple files but is missing."
+  - name: "MetaRootOutputMissingInMultiple"
+    msg: "required field is required for multiple files but is missing."
+
+meta:
+  template:
+    path: "errors.go.tmpl"
+    from: "params"
+  output:
+    path: "../../params/errors.go"
+    from: "params"

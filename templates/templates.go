@@ -7,6 +7,14 @@ import (
 )
 
 var Funcs = template.FuncMap{
+	"add": TemplateAdd,
+	"sub": TemplateSub,
+	"mul": TemplateMul,
+	"div": TemplateDiv,
+	"rem": TemplateRem,
+
+	"join": TemplateJoinFn,
+
 	"uppercase":    TemplateUpperCase,
 	"lowercase":    TemplateLowerCase,
 	"titlecase":    TemplateTitleCase,
@@ -23,13 +31,27 @@ var Funcs = template.FuncMap{
 	"escapehtml":      EscapeHtml,
 	"repl":            Replace,
 
-	"map":  TemplateMap,
-	"list": TemplateList,
+	"ismap": TemplateIsMap,
+	"isstr": TemplateIsStr,
+	"isint": TemplateIsInt,
+	"isarr": TemplateIsArr,
+
+	"map":    TemplateMap,
+	"list":   TemplateList,
+	"set":    TemplateSet,
+	"append": TemplateAppend,
+	"slice":  TemplateSlice,
 
 	"jq1": TemplateJq1,
 	"jqn": TemplateJqN,
 
-	"err": TemplateErr,
+	"err":   TemplateErr,
+	"dump":  TemplateDump,
+	"probe": TemplateProbe,
+
+	"toml": TemplateToToml,
+	"yaml": TemplateToYaml,
+	"json": TemplateToJson,
 }
 
 var LeftDelim string = ""
@@ -46,7 +68,7 @@ func Init() {
 		Funcs(Funcs)
 
 	builtinTemplates := []string{
-		TemplateJoin,
+		TemplateJoinT,
 	}
 
 	for i, builtin := range builtinTemplates {
@@ -60,6 +82,30 @@ func Init() {
 
 func GetTemplate() *template.Template {
 	return template.Must(baseTemplate.Clone())
+}
+
+// Convertes containers to pointers to containers.
+func PrepareData(data any) any {
+	switch val := data.(type) {
+	case []any:
+		newSlice := make([]any, 0, len(val))
+
+		for _, item := range val {
+			newSlice = append(newSlice, PrepareData(item))
+		}
+
+		return &newSlice
+	case map[string]any:
+		newMap := make(map[string]any, len(val))
+
+		for key, value := range val {
+			newMap[key] = PrepareData(value)
+		}
+
+		return &newMap
+	default:
+		return val
+	}
 }
 
 func ExpandString(name, content string, data map[string]any) (string, error) {
