@@ -185,7 +185,7 @@ Go template syntax and do not actually exist.
 ### escapedouble :: string -> string -> string
 
 Will return a new string similar to the one in the second argument but
-with very character contained in the first string being preceded by
+with every character contained in the first string being preceded by
 itself.
 
 ```
