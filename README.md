@@ -26,7 +26,7 @@ The `meta` table, if present, may contain the following entries:
 - `prompts`: A list of values to be provided interactively;
 - `left_delim`: Left delimiter for templates, which by default is `{{`;
 - `right_delim`: Right delimiter for templates, which by default is
-  `{{`;
+  `}}`;
 - `case`: If set to `turkish` or `azeri`, the case-modifying template
   functions will change the case appropriately.
 
